@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS2 Skin Radar — Live Deal Scanner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #07090e;
+  --surface:  #0c1120;
+  --surface2: #111829;
+  --surface3: #162034;
+  --border:   #1c2c47;
+  --accent:   #e8a034;
+  --accent2:  #f0b84a;
+  --green:    #3dd68c;
+  --green2:   #22c55e;
+  --blue:     #4d9fff;
+  --red:      #ff4757;
+  --text:     #e2e8f0;
+  --muted:    #6b7f9c;
+  --muted2:   #4a5872;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(180deg, #0a1428 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent) 0%, #c97c20 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.logo-text h1 {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.logo-text span {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(61, 214, 140, 0.1);
+  border: 1px solid rgba(61, 214, 140, 0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 0.08em;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.refresh-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refresh-btn:hover {
+  background: var(--surface3);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.refresh-btn svg { transition: transform 0.4s; }
+.refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.update-time {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.stats-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: 52px;
+  overflow-x: auto;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.stat:first-child { padding-left: 0; }
+
+.stat-icon { font-size: 16px; }
+
+.stat-info { display: flex; flex-direction: column; gap: 1px; }
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.stat-value.green { color: var(--green); }
+.stat-value.accent { color: var(--accent); }
+
+/* ── SOURCES BAR ── */
+.sources-bar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.sources-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  overflow-x: auto;
+}
+
+.sources-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+.source-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid;
+  white-space: nowrap;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.source-chip.live {
+  background: rgba(61, 214, 140, 0.07);
+  border-color: rgba(61, 214, 140, 0.25);
+  color: var(--green);
+}
+
+.source-chip.live:hover {
+  background: rgba(61, 214, 140, 0.15);
+}
+
+.source-chip.ref {
+  background: rgba(77, 159, 255, 0.07);
+  border-color: rgba(77, 159, 255, 0.25);
+  color: var(--blue);
+}
+
+.source-chip.soon {
+  background: rgba(107, 127, 156, 0.07);
+  border-color: rgba(107, 127, 156, 0.2);
+  color: var(--muted);
+}
+
+.source-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.source-chip.live .source-dot { animation: pulse 2s ease-in-out infinite; }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── FILTERS SIDEBAR ── */
+.filters-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  position: sticky;
+  top: 84px;
+}
+
+.filters-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reset-btn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.reset-btn:hover { opacity: 0.7; }
+
+.filter-group {
+  margin-bottom: 18px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-label .val {
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.filter-range {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.filter-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.filter-select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Inter', system-ui;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.filter-select:hover, .filter-select:focus { border-color: var(--accent); }
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip.active {
+  background: rgba(232, 160, 52, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+/* ── CONTENT AREA ── */
+.content { min-width: 0; }
+
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.results-count {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.results-count strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.sort-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-label {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── SKIN GRID ── */
+.skin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+/* ── SKIN CARD ── */
+.skin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: default;
+  position: relative;
+}
+
+.skin-card:hover {
+  border-color: rgba(232, 160, 52, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(232, 160, 52, 0.1);
+}
+
+.skin-card.hot { border-color: rgba(255, 71, 87, 0.4); }
+.skin-card.hot:hover { border-color: var(--red); }
+
+.card-img-area {
+  background: linear-gradient(135deg, #0f1826 0%, #0a1220 100%);
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-img-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 60%, rgba(232,160,52,0.06) 0%, transparent 70%);
+}
+
+.item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.item-img-fallback {
+  font-size: 48px;
+  position: relative;
+  z-index: 1;
+  opacity: 0.6;
+  user-select: none;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(61, 214, 140, 0.15);
+  border: 1px solid rgba(61, 214, 140, 0.3);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  z-index: 2;
+}
+
+.discount-badge.fire {
+  background: rgba(255, 71, 87, 0.15);
+  border-color: rgba(255, 71, 87, 0.35);
+  color: var(--red);
+}
+
+.discount-badge.hot {
+  background: rgba(232, 160, 52, 0.15);
+  border-color: rgba(232, 160, 52, 0.35);
+  color: var(--accent);
+}
+
+.stattrak-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(232, 160, 52, 0.15);
+  border: 1px solid rgba(232, 160, 52, 0.3);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+
+.card-body {
+  padding: 12px;
+}
+
+.card-weapon {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-condition {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.cond-fn { background: rgba(61,214,140,0.12); color: #3dd68c; }
+.cond-mw { background: rgba(77,159,255,0.12); color: #4d9fff; }
+.cond-ft { background: rgba(250,204,21,0.12); color: #facc15; }
+.cond-ww { background: rgba(249,115,22,0.12); color: #f97316; }
+.cond-bs { background: rgba(255,71,87,0.12); color: #ff4757; }
+
+.price-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.price-main {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--green);
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1;
+}
+
+.price-ref {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  text-decoration: line-through;
+  text-align: right;
+}
+
+.price-ref-label {
+  font-size: 9px;
+  color: var(--muted2);
+  text-decoration: none;
+  display: block;
+  font-family: 'Inter', system-ui;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.qty {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.qty span { color: var(--text); font-weight: 600; }
+
+.buy-btn {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  background: linear-gradient(135deg, rgba(232,160,52,0.15) 0%, rgba(232,160,52,0.08) 100%);
+  border: 1px solid rgba(232,160,52,0.3);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.buy-btn:hover {
+  background: rgba(232,160,52,0.25);
+  border-color: var(--accent);
+}
+
+.card-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 10px 0;
+}
+
+.card-sources {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.source-link {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.source-link:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+/* ── LOADING ── */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7,9,14,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-overlay.active { display: flex; }
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ── SKELETON ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 6px; }
+.empty-state p { font-size: 14px; }
+
+/* ── ERROR STATE ── */
+.error-banner {
+  display: none;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--red);
+  margin-bottom: 16px;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-banner.visible { display: flex; }
+
+/* ── COUNTDOWN ── */
+.countdown {
+  font-size: 11px;
+  color: var(--muted2);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── LOAD MORE ── */
+.load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.load-more-btn {
+  padding: 10px 28px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.load-more-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .main {
+    grid-template-columns: 1fr;
+    padding: 12px 16px;
+  }
+
+  .filters-panel {
+    position: static;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 12px 0;
+  }
+
+  .update-time { display: none; }
+  .stats-inner { height: auto; padding: 8px 0; flex-wrap: wrap; }
+  .stat { height: 44px; }
+}
+
+@media (max-width: 480px) {
+  .skin-grid { grid-template-columns: 1fr 1fr; }
+  .sources-inner { gap: 4px; }
+  .logo-text h1 { font-size: 14px; }
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+
+/* ── NOTICE BAR ── */
+.notice-bar {
+  background: rgba(77, 159, 255, 0.08);
+  border-bottom: 1px solid rgba(77, 159, 255, 0.2);
+  padding: 8px 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--blue);
+}
+
+.notice-bar a { color: var(--blue); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">Escaneando mercado...</div>
+</div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🎯</div>
+      <div class="logo-text">
+        <h1>CS2 SKIN RADAR</h1>
+        <span>Scanner de preços abaixo do mercado • Ao vivo</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <div class="update-time" id="updateTime">Carregando...</div>
+      <div class="countdown" id="countdown"></div>
+      <button class="refresh-btn" id="refreshBtn" onclick="refresh()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        Atualizar
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stats-inner" id="statsBar">
+    <div class="stat">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <div class="stat-label">Deals encontradas</div>
+        <div class="stat-value" id="statDeals">—</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">📉</div>
+      <div class="stat-info">
+        <div class="stat-label">Desconto médio</div>
+        <div class="stat-value green" id="statAvgDiscount">—</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-info">
+        <div class="stat-label">Maior desconto</div>
+        <div class="stat-value accent" id="statBestDiscount">—</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🏷️</div>
+      <div class="stat-info">
+        <div class="stat-label">Mais barato</div>
+        <div class="stat-value" id="statCheapest">—</div>
+      </div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">📦</div>
+      <div class="stat-info">
+        <div class="stat-label">Total no mercado</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sources bar -->
+<div class="sources-bar">
+  <div class="sources-inner">
+    <span class="sources-label">Fontes:</span>
+    <a class="source-chip live" href="https://skinport.com" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      Skinport
+    </a>
+    <div class="source-chip ref">
+      <div class="source-dot"></div>
+      Steam (referência)
+    </div>
+    <a class="source-chip soon" href="https://cs.money" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      CS.MONEY
+    </a>
+    <a class="source-chip soon" href="https://dmarket.com" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      DMarket
+    </a>
+    <a class="source-chip soon" href="https://bitskins.com" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      BitSkins
+    </a>
+    <a class="source-chip soon" href="https://waxpeer.com" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      Waxpeer
+    </a>
+    <a class="source-chip soon" href="https://buff.163.com" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      Buff163
+    </a>
+    <a class="source-chip soon" href="https://skinbaron.de" target="_blank" rel="noopener">
+      <div class="source-dot"></div>
+      SkinBaron
+    </a>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+  <!-- Filters sidebar -->
+  <aside class="filters-panel">
+    <div class="filters-title">
+      Filtros
+      <button class="reset-btn" onclick="resetFilters()">Resetar</button>
+    </div>
+
+    <!-- Min discount -->
+    <div class="filter-group">
+      <div class="filter-label">
+        Desconto mínimo
+        <span class="val" id="discountVal">10%</span>
+      </div>
+      <input type="range" class="filter-range" id="discountRange"
+        min="0" max="70" value="10" step="1"
+        oninput="onFilterChange()">
+    </div>
+
+    <!-- Max price -->
+    <div class="filter-group">
+      <div class="filter-label">
+        Preço máximo
+        <span class="val" id="priceVal">$500</span>
+      </div>
+      <input type="range" class="filter-range" id="priceRange"
+        min="1" max="2000" value="500" step="1"
+        oninput="onFilterChange()">
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Condition -->
+    <div class="filter-group">
+      <div class="filter-label">Condição</div>
+      <div class="filter-chips" id="condChips">
+        <div class="chip active" data-cond="" onclick="toggleCond(this)">Todas</div>
+        <div class="chip" data-cond="Factory New" onclick="toggleCond(this)">FN</div>
+        <div class="chip" data-cond="Minimal Wear" onclick="toggleCond(this)">MW</div>
+        <div class="chip" data-cond="Field-Tested" onclick="toggleCond(this)">FT</div>
+        <div class="chip" data-cond="Well-Worn" onclick="toggleCond(this)">WW</div>
+        <div class="chip" data-cond="Battle-Scarred" onclick="toggleCond(this)">BS</div>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="filter-group">
+      <div class="filter-label">Categoria</div>
+      <div class="filter-chips" id="catChips">
+        <div class="chip active" data-cat="" onclick="toggleCat(this)">Todas</div>
+        <div class="chip" data-cat="rifles" onclick="toggleCat(this)">Rifles</div>
+        <div class="chip" data-cat="pistols" onclick="toggleCat(this)">Pistolas</div>
+        <div class="chip" data-cat="knives" onclick="toggleCat(this)">Facas</div>
+        <div class="chip" data-cat="gloves" onclick="toggleCat(this)">Luvas</div>
+        <div class="chip" data-cat="smgs" onclick="toggleCat(this)">SMGs</div>
+        <div class="chip" data-cat="snipers" onclick="toggleCat(this)">Sniper</div>
+        <div class="chip" data-cat="shotguns" onclick="toggleCat(this)">Shotgun</div>
+        <div class="chip" data-cat="heavy" onclick="toggleCat(this)">Heavy</div>
+      </div>
+    </div>
+
+    <!-- StatTrak -->
+    <div class="filter-group">
+      <div class="filter-label">Tipo</div>
+      <div class="filter-chips" id="stChips">
+        <div class="chip active" data-st="" onclick="toggleSt(this)">Todos</div>
+        <div class="chip" data-st="stattrak" onclick="toggleSt(this)">StatTrak™</div>
+        <div class="chip" data-st="normal" onclick="toggleSt(this)">Normal</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Sort -->
+    <div class="filter-group">
+      <div class="filter-label">Ordenar por</div>
+      <select class="filter-select" id="sortSelect" onchange="onFilterChange()">
+        <option value="discount_desc">Maior desconto</option>
+        <option value="price_asc">Menor preço</option>
+        <option value="price_desc">Maior preço</option>
+        <option value="discount_asc">Menor desconto</option>
+      </select>
+    </div>
+  </aside>
+
+  <!-- Cards area -->
+  <div class="content">
+    <div class="error-banner" id="errorBanner">
+      ⚠️ <span id="errorMsg">Erro ao carregar dados</span>
+    </div>
+
+    <div class="content-header">
+      <div class="results-count" id="resultsCount">
+        <strong id="visibleCount">0</strong> skins abaixo do mercado
+      </div>
+    </div>
+
+    <div class="skin-grid" id="skinGrid">
+      <!-- Skeleton cards -->
+      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+    </div>
+
+    <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+      <button class="load-more-btn" onclick="loadMore()">Carregar mais</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const PAGE_SIZE = 48;
+const REFRESH_INTERVAL = 3 * 60 * 1000; // 3 min
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+const SKINPORT_URL = 'https://api.skinport.com/v1/items?app_id=730&currency=USD';
+
+// ── STATE ────────────────────────────────────────────────────────
+let allItems = [];
+let filteredItems = [];
+let displayedCount = 0;
+let lastFetchTime = null;
+let countdownInterval = null;
+let refreshTimeout = null;
+
+// ── WEAPON CLASSIFICATION ────────────────────────────────────────
+const CATEGORIES = {
+  rifles:   ['AK-47','M4A4','M4A1-S','AWP','FAMAS','Galil AR','AUG','SG 553','SCAR-20','G3SG1','SSG 08'],
+  pistols:  ['Desert Eagle','USP-S','Glock-18','P250','Five-SeveN','Tec-9','CZ75-Auto','P2000','Dual Berettas','R8 Revolver'],
+  smgs:     ['MP9','MAC-10','UMP-45','PP-Bizon','P90','MP7','MP5-SD'],
+  shotguns: ['Nova','XM1014','MAG-7','Sawed-Off'],
+  heavy:    ['Negev','M249'],
+  snipers:  ['AWP','SSG 08','SCAR-20','G3SG1'],
+  knives:   ['Karambit','Bayonet','M9 Bayonet','Butterfly','Falchion','Flip Knife','Gut Knife','Huntsman','Shadow Daggers','Navaja','Stiletto','Talon','Ursus','Paracord','Survival Knife','Nomad','Skeleton','Classic Knife','Kukri','Hook Knife'],
+  gloves:   ['Gloves','Wraps','Hand Wraps'],
+};
+
+const CAT_EMOJI = {
+  rifles: '🔫', pistols: '🔫', smgs: '🔫', shotguns: '🔫',
+  heavy: '💣', snipers: '🎯', knives: '🔪', gloves: '🧤', other: '📦',
+};
+
+function getCategory(name) {
+  // Knives and gloves first (★ prefix)
+  if (/Gloves|Wraps|Hand Wrap/i.test(name)) return 'gloves';
+  if (/Karambit|Bayonet|M9 Bay|Butterfly|Falchion|Flip Knife|Gut Knife|Huntsman|Shadow Dag|Navaja|Stiletto|Talon|Ursus|Paracord|Survival|Nomad|Skeleton|Classic Knife|Kukri|Hook Knife/i.test(name)) return 'knives';
+  // Snipers (check before rifles since AWP is in both)
+  if (/\b(AWP|SSG 08|SCAR-20|G3SG1)\b/i.test(name)) return 'snipers';
+  for (const [cat, weapons] of Object.entries(CATEGORIES)) {
+    if (cat === 'knives' || cat === 'gloves' || cat === 'snipers') continue;
+    if (weapons.some(w => name.includes(w))) return cat;
+  }
+  if (name.startsWith('★')) return 'knives';
+  return 'other';
+}
+
+function getCondition(name) {
+  const m = name.match(/\((Factory New|Minimal Wear|Field-Tested|Well-Worn|Battle-Scarred)\)/);
+  return m ? m[1] : null;
+}
+
+function condClass(cond) {
+  return { 'Factory New':'cond-fn','Minimal Wear':'cond-mw','Field-Tested':'cond-ft','Well-Worn':'cond-ww','Battle-Scarred':'cond-bs' }[cond] || '';
+}
+
+function condShort(cond) {
+  return { 'Factory New':'Factory New','Minimal Wear':'Minimal Wear','Field-Tested':'Field-Tested','Well-Worn':'Well-Worn','Battle-Scarred':'Battle-Scarred' }[cond] || '';
+}
+
+function isStatTrak(name) { return name.includes('StatTrak'); }
+function isSouvenir(name) { return name.includes('Souvenir'); }
+
+function calcDiscount(min, suggested) {
+  if (!min || !suggested || suggested <= 0) return 0;
+  return ((suggested - min) / suggested) * 100;
+}
+
+function fmt(price) {
+  if (!price && price !== 0) return '—';
+  return '$' + price.toFixed(2);
+}
+
+function fmtDiscount(d) {
+  return '-' + d.toFixed(1) + '%';
+}
+
+// ── ITEM IMAGE ───────────────────────────────────────────────────
+function getImageUrl(name) {
+  // Try Skinport CDN-style URL (they use Steam CDN internally)
+  // We'll use a community service that maps item names to images
+  return `https://api.steamapis.com/image/item/730/${encodeURIComponent(name)}`;
+}
+
+function getWeaponPart(name) {
+  // Extract weapon name before the "|"
+  const pipe = name.indexOf(' | ');
+  if (pipe !== -1) return name.substring(0, pipe).replace(/^★ /, '').replace('StatTrak™ ', '').trim();
+  return name.replace(/^★ /, '').replace('StatTrak™ ', '').trim();
+}
+
+function getSkinPart(name) {
+  const pipe = name.indexOf(' | ');
+  if (pipe !== -1) {
+    const after = name.substring(pipe + 3);
+    return after.replace(/\s*\(.*?\)\s*$/, '').replace('StatTrak™ ', '').trim();
+  }
+  return '';
+}
+
+// ── FETCH DATA ───────────────────────────────────────────────────
+async function fetchSkinport() {
+  // Try direct first, then CORS proxy fallback
+  const urls = [
+    SKINPORT_URL,
+    CORS_PROXY + encodeURIComponent(SKINPORT_URL),
+  ];
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('Invalid response');
+      return data;
+    } catch (err) {
+      console.warn('Fetch attempt failed:', url, err.message);
+    }
+  }
+  throw new Error('Falha ao conectar com Skinport API');
+}
+
+async function loadData() {
+  showLoading(true);
+  hideError();
+
+  try {
+    const raw = await fetchSkinport();
+
+    allItems = raw.map(item => {
+      const discount = calcDiscount(item.min_price, item.suggested_price);
+      return {
+        name: item.market_hash_name,
+        weapon: getWeaponPart(item.market_hash_name),
+        skin: getSkinPart(item.market_hash_name),
+        condition: getCondition(item.market_hash_name),
+        category: getCategory(item.market_hash_name),
+        stattrak: isStatTrak(item.market_hash_name),
+        souvenir: isSouvenir(item.market_hash_name),
+        min_price: item.min_price,
+        suggested_price: item.suggested_price,
+        max_price: item.max_price,
+        mean_price: item.mean_price,
+        quantity: item.quantity || 0,
+        discount,
+        url: item.market_page || item.item_page || `https://skinport.com/market?q=${encodeURIComponent(item.market_hash_name)}`,
+        steamUrl: `https://steamcommunity.com/market/listings/730/${encodeURIComponent(item.market_hash_name)}`,
+      };
+    });
+
+    lastFetchTime = new Date();
+    updateStats();
+    applyFilters();
+    startCountdown();
+
+  } catch (err) {
+    console.error(err);
+    showError(err.message || 'Erro desconhecido');
+    if (allItems.length === 0) {
+      document.getElementById('skinGrid').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">⚠️</div>
+          <h3>Falha ao carregar</h3>
+          <p>Tente atualizar em alguns segundos</p>
+        </div>`;
+    }
+  } finally {
+    showLoading(false);
+  }
+}
+
+// ── FILTERS ─────────────────────────────────────────────────────
+let activeCond = '';
+let activeCat  = '';
+let activeSt   = '';
+
+function getFilters() {
+  return {
+    minDiscount: parseInt(document.getElementById('discountRange').value),
+    maxPrice:    parseInt(document.getElementById('priceRange').value),
+    sortBy:      document.getElementById('sortSelect').value,
+    cond:        activeCond,
+    cat:         activeCat,
+    st:          activeSt,
+  };
+}
+
+function applyFilters() {
+  const f = getFilters();
+
+  filteredItems = allItems.filter(item => {
+    if (item.discount < f.minDiscount) return false;
+    if (item.min_price > f.maxPrice) return false;
+    if (!item.min_price) return false;
+    if (f.cond && item.condition !== f.cond) return false;
+    if (f.cat && item.category !== f.cat) return false;
+    if (f.st === 'stattrak' && !item.stattrak) return false;
+    if (f.st === 'normal' && item.stattrak) return false;
+    return true;
+  });
+
+  // Sort
+  filteredItems.sort((a, b) => {
+    switch (f.sortBy) {
+      case 'discount_desc': return b.discount - a.discount;
+      case 'discount_asc':  return a.discount - b.discount;
+      case 'price_asc':     return a.min_price - b.min_price;
+      case 'price_desc':    return b.min_price - a.min_price;
+      default:              return b.discount - a.discount;
+    }
+  });
+
+  displayedCount = 0;
+  document.getElementById('skinGrid').innerHTML = '';
+  document.getElementById('loadMoreWrap').style.display = 'none';
+  document.getElementById('visibleCount').textContent = filteredItems.length;
+
+  if (filteredItems.length === 0) {
+    document.getElementById('skinGrid').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <h3>Nenhuma skin encontrada</h3>
+        <p>Tente reduzir o desconto mínimo ou aumentar o preço máximo</p>
+      </div>`;
+    return;
+  }
+
+  renderBatch();
+}
+
+function renderBatch() {
+  const grid = document.getElementById('skinGrid');
+  const slice = filteredItems.slice(displayedCount, displayedCount + PAGE_SIZE);
+  displayedCount += slice.length;
+
+  slice.forEach(item => {
+    grid.insertAdjacentHTML('beforeend', buildCard(item));
+  });
+
+  const hasMore = displayedCount < filteredItems.length;
+  document.getElementById('loadMoreWrap').style.display = hasMore ? 'flex' : 'none';
+}
+
+function loadMore() {
+  renderBatch();
+}
+
+function buildCard(item) {
+  const disc = item.discount;
+  const discClass = disc >= 30 ? 'fire' : disc >= 20 ? 'hot' : '';
+  const cardHot = disc >= 30 ? ' hot' : '';
+  const emoji = CAT_EMOJI[item.category] || '📦';
+  const imgUrl = getImageUrl(item.name);
+
+  const condBadge = item.condition
+    ? `<span class="card-condition ${condClass(item.condition)}">${condShort(item.condition)}</span>`
+    : '';
+
+  const stBadge = item.stattrak
+    ? `<div class="stattrak-badge">ST™</div>` : '';
+
+  const souvenirBadge = item.souvenir
+    ? `<div class="stattrak-badge" style="color:#facc15;border-color:rgba(250,204,21,0.3);background:rgba(250,204,21,0.1)">SV</div>` : '';
+
+  const refPrice = item.suggested_price
+    ? `<div><span class="price-ref-label">Steam</span><span class="price-ref">${fmt(item.suggested_price)}</span></div>`
+    : '';
+
+  const skinName = item.skin || item.weapon;
+
+  return `
+<div class="skin-card${cardHot}">
+  <div class="card-img-area">
+    ${stBadge}${souvenirBadge}
+    <img class="item-img" src="${imgUrl}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+      loading="lazy" alt="${item.name}">
+    <div class="item-img-fallback" style="display:none">${emoji}</div>
+    <div class="discount-badge ${discClass}">${fmtDiscount(disc)}</div>
+  </div>
+  <div class="card-body">
+    <div class="card-weapon">${item.weapon}</div>
+    <div class="card-name" title="${skinName}">${skinName}</div>
+    ${condBadge}
+    <div class="price-row">
+      <div class="price-main">${fmt(item.min_price)}</div>
+      ${refPrice}
+    </div>
+    <div class="qty">
+      <span>${item.quantity}</span> disponíveis no Skinport
+    </div>
+    <div class="card-divider"></div>
+    <div class="card-sources" style="margin-bottom:8px">
+      <a class="source-link" href="${item.url}" target="_blank" rel="noopener">Skinport</a>
+      <a class="source-link" href="${item.steamUrl}" target="_blank" rel="noopener">Steam</a>
+    </div>
+    <a class="buy-btn" href="${item.url}" target="_blank" rel="noopener">
+      Ver deal →
+    </a>
+  </div>
+</div>`;
+}
+
+// ── STATS ───────────────────────────────────────────────────────
+function updateStats() {
+  if (!allItems.length) return;
+
+  const withDiscount = allItems.filter(i => i.discount > 0 && i.min_price);
+  const discounts = withDiscount.map(i => i.discount);
+  const avgDiscount = discounts.length ? discounts.reduce((a, b) => a + b, 0) / discounts.length : 0;
+  const bestDiscount = Math.max(...discounts);
+  const bestItem = withDiscount.find(i => i.discount === bestDiscount);
+  const cheapest = [...withDiscount].sort((a, b) => a.min_price - b.min_price)[0];
+
+  document.getElementById('statDeals').textContent = withDiscount.length;
+  document.getElementById('statAvgDiscount').textContent = '-' + avgDiscount.toFixed(1) + '%';
+  document.getElementById('statBestDiscount').textContent = bestItem
+    ? `-${bestDiscount.toFixed(1)}% (${getWeaponPart(bestItem.name)})`
+    : '—';
+  document.getElementById('statCheapest').textContent = cheapest ? fmt(cheapest.min_price) : '—';
+  document.getElementById('statTotal').textContent = allItems.length;
+}
+
+// ── FILTER HANDLERS ─────────────────────────────────────────────
+function onFilterChange() {
+  const dr = document.getElementById('discountRange');
+  const pr = document.getElementById('priceRange');
+  document.getElementById('discountVal').textContent = dr.value + '%';
+  document.getElementById('priceVal').textContent = '$' + parseInt(pr.value).toLocaleString();
+  if (allItems.length) applyFilters();
+}
+
+function toggleCond(el) {
+  activeCond = el.dataset.cond;
+  document.querySelectorAll('#condChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (allItems.length) applyFilters();
+}
+
+function toggleCat(el) {
+  activeCat = el.dataset.cat;
+  document.querySelectorAll('#catChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (allItems.length) applyFilters();
+}
+
+function toggleSt(el) {
+  activeSt = el.dataset.st;
+  document.querySelectorAll('#stChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (allItems.length) applyFilters();
+}
+
+function resetFilters() {
+  document.getElementById('discountRange').value = 10;
+  document.getElementById('priceRange').value = 500;
+  document.getElementById('sortSelect').value = 'discount_desc';
+  activeCond = '';
+  activeCat  = '';
+  activeSt   = '';
+  document.querySelectorAll('#condChips .chip').forEach((c,i) => c.classList.toggle('active', i === 0));
+  document.querySelectorAll('#catChips .chip').forEach((c,i) => c.classList.toggle('active', i === 0));
+  document.querySelectorAll('#stChips .chip').forEach((c,i) => c.classList.toggle('active', i === 0));
+  onFilterChange();
+}
+
+// ── COUNTDOWN ───────────────────────────────────────────────────
+function startCountdown() {
+  if (countdownInterval) clearInterval(countdownInterval);
+  if (refreshTimeout) clearTimeout(refreshTimeout);
+
+  let remaining = REFRESH_INTERVAL;
+
+  const el = document.getElementById('countdown');
+  const update = () => {
+    const m = Math.floor(remaining / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    el.textContent = `Próximo update: ${m}:${s.toString().padStart(2,'0')}`;
+  };
+
+  update();
+  countdownInterval = setInterval(() => {
+    remaining -= 1000;
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      el.textContent = 'Atualizando...';
+    } else {
+      update();
+    }
+  }, 1000);
+
+  refreshTimeout = setTimeout(() => {
+    refresh();
+  }, REFRESH_INTERVAL);
+
+  if (lastFetchTime) {
+    const t = lastFetchTime;
+    const tf = t.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('updateTime').textContent = `Atualizado às ${tf}`;
+  }
+}
+
+async function refresh() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  await loadData();
+  btn.classList.remove('spinning');
+}
+
+// ── UI HELPERS ──────────────────────────────────────────────────
+function showLoading(show) {
+  document.getElementById('loadingOverlay').classList.toggle('active', show);
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  document.getElementById('errorMsg').textContent = msg;
+  el.classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('errorBanner').classList.remove('visible');
+}
+
+// ── INIT ────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  onFilterChange(); // Set initial display values
+  loadData();
+});
+</script>
+</body>
+</html>
