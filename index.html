@@ -775,13 +775,18 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     </div>
 
     <div class="fg">
-      <div class="fl">Desconto mínimo <span class="fv" id="fv-disc">10%</span></div>
-      <input type="range" id="fr-disc" min="0" max="70" value="10" step="1" oninput="onFC()">
+      <div class="fl">Desconto mínimo <span class="fv" id="fv-disc">15%</span></div>
+      <input type="range" id="fr-disc" min="0" max="80" value="15" step="1" oninput="onFC()">
     </div>
 
     <div class="fg">
-      <div class="fl">Preço máximo <span class="fv" id="fv-price">$500</span></div>
-      <input type="range" id="fr-price" min="1" max="2000" value="500" step="1" oninput="onFC()">
+      <div class="fl">Preço mínimo <span class="fv" id="fv-minprice">$15</span></div>
+      <input type="range" id="fr-minprice" min="0" max="500" value="15" step="5" oninput="onFC()">
+    </div>
+
+    <div class="fg">
+      <div class="fl">Preço máximo <span class="fv" id="fv-price">$5.000</span></div>
+      <input type="range" id="fr-price" min="50" max="10000" value="5000" step="50" oninput="onFC()">
     </div>
 
     <div class="sep"></div>
@@ -801,15 +806,15 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     <div class="fg">
       <div class="fl">Categoria</div>
       <div class="chips" id="chips-cat">
-        <div class="chip on" data-v="" onclick="pickCat(this)">Todas</div>
+        <div class="chip" data-v="" onclick="pickCat(this)">Todas</div>
+        <div class="chip on" data-v="weapons" onclick="pickCat(this)">Armas</div>
         <div class="chip" data-v="rifles" onclick="pickCat(this)">Rifles</div>
         <div class="chip" data-v="pistols" onclick="pickCat(this)">Pistolas</div>
         <div class="chip" data-v="knives" onclick="pickCat(this)">Facas</div>
         <div class="chip" data-v="gloves" onclick="pickCat(this)">Luvas</div>
         <div class="chip" data-v="smgs" onclick="pickCat(this)">SMGs</div>
         <div class="chip" data-v="snipers" onclick="pickCat(this)">Sniper</div>
-        <div class="chip" data-v="shotguns" onclick="pickCat(this)">Shotgun</div>
-        <div class="chip" data-v="heavy" onclick="pickCat(this)">Heavy</div>
+        <div class="chip" data-v="misc" onclick="pickCat(this)">Stickers/Misc</div>
       </div>
     </div>
 
@@ -827,9 +832,10 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
     <div class="fg">
       <div class="fl">Ordenar por</div>
       <select class="fselect" id="fsort" onchange="onFC()">
-        <option value="disc_d">Maior desconto</option>
-        <option value="price_a">Menor preço</option>
+        <option value="value">Melhor valor (preço × desconto)</option>
+        <option value="disc_d">Maior desconto %</option>
         <option value="price_d">Maior preço</option>
+        <option value="price_a">Menor preço</option>
         <option value="disc_a">Menor desconto</option>
       </select>
     </div>
@@ -889,11 +895,17 @@ const fetchers = [
 
 // ── STATE ────────────────────────────────────────────────────────
 let all = [], filtered = [], shown = 0;
-let activeCond = '', activeCat = '', activeSt = '';
+let activeCond = '', activeCat = 'weapons', activeSt = '';
 let lastFetch = null, cTimer = null, rTimer = null;
 
 // ── CATEGORIES ──────────────────────────────────────────────────
+// Returns 'misc' for stickers/graffiti/cases/agents — excluded from "Armas" default view
 function cat(name) {
+  // Misc first — these are NOT weapon skins
+  if (/^(Sealed Graffiti|Graffiti|Sticker|Patch|Pin|Music Kit|Souvenir Package|Operation|Pass)/i.test(name)) return 'misc';
+  if (/\b(Case|Capsule|Package)\b/.test(name) && !/\b(AK|M4|AWP|Knife|Karambit|Gloves)\b/.test(name)) return 'misc';
+  if (/^Agent\b/i.test(name)) return 'misc';
+  // Weapons
   if (/Gloves|Wraps|Hand Wrap/i.test(name)) return 'gloves';
   if (/Karambit|Bayonet|Butterfly|Falchion|Flip Knife|Gut Knife|Huntsman|Shadow Dag|Navaja|Stiletto|Talon|Ursus|Paracord|Survival Knife|Nomad Knife|Skeleton|Classic Knife|Kukri|Hook/i.test(name)) return 'knives';
   if (/\b(AWP|SSG 08|SCAR-20|G3SG1)\b/.test(name)) return 'snipers';
@@ -903,7 +915,7 @@ function cat(name) {
   if (/\b(Nova|XM1014|MAG-7|Sawed-Off)\b/.test(name)) return 'shotguns';
   if (/\b(Negev|M249)\b/.test(name)) return 'heavy';
   if (name.startsWith('★')) return 'knives';
-  return 'other';
+  return 'misc'; // anything unclassified = misc
 }
 
 function cond(name) {
@@ -994,8 +1006,9 @@ async function loadData() {
 
 // ── FILTERS ──────────────────────────────────────────────────────
 function onFC() {
-  document.getElementById('fv-disc').textContent  = document.getElementById('fr-disc').value + '%';
-  document.getElementById('fv-price').textContent = '$' + parseInt(document.getElementById('fr-price').value).toLocaleString();
+  document.getElementById('fv-disc').textContent     = document.getElementById('fr-disc').value + '%';
+  document.getElementById('fv-minprice').textContent = '$' + parseInt(document.getElementById('fr-minprice').value).toLocaleString();
+  document.getElementById('fv-price').textContent    = '$' + parseInt(document.getElementById('fr-price').value).toLocaleString();
   if (all.length) applyFilters();
 }
 
@@ -1009,38 +1022,51 @@ function setActive(sel, el) {
 }
 
 function resetFilters() {
-  document.getElementById('fr-disc').value  = 10;
-  document.getElementById('fr-price').value = 500;
-  document.getElementById('fsort').value    = 'disc_d';
-  activeCond = ''; activeCat = ''; activeSt = '';
-  ['#chips-cond','#chips-cat','#chips-st'].forEach(sel => {
-    const chips = document.querySelectorAll(sel + ' .chip');
-    chips.forEach((c,i) => c.classList.toggle('on', i===0));
-  });
+  document.getElementById('fr-disc').value     = 15;
+  document.getElementById('fr-minprice').value = 15;
+  document.getElementById('fr-price').value    = 5000;
+  document.getElementById('fsort').value       = 'value';
+  activeCond = ''; activeCat = 'weapons'; activeSt = '';
+  // Cond chips: first active
+  document.querySelectorAll('#chips-cond .chip').forEach((c,i) => c.classList.toggle('on', i===0));
+  // Cat chips: "Armas" active (index 1)
+  document.querySelectorAll('#chips-cat .chip').forEach((c,i) => c.classList.toggle('on', i===1));
+  // St chips: first active
+  document.querySelectorAll('#chips-st .chip').forEach((c,i) => c.classList.toggle('on', i===0));
   onFC();
 }
 
+// Deal value score: discount% × log(price) — rewards high-price + high-discount combos
+function dealScore(x) { return x.discount * Math.log10(x.price + 1); }
+
 function applyFilters() {
   const minD  = parseInt(document.getElementById('fr-disc').value);
+  const minP  = parseInt(document.getElementById('fr-minprice').value);
   const maxP  = parseInt(document.getElementById('fr-price').value);
   const sort  = document.getElementById('fsort').value;
 
   filtered = all.filter(x => {
     if (x.discount < minD) return false;
-    if (x.price > maxP) return false;
+    if (x.price < minP)    return false;
+    if (x.price > maxP)    return false;
+    if (!x.ref)            return false;  // must have Steam reference price
     if (activeCond && x.condition !== activeCond) return false;
-    if (activeCat  && x.category  !== activeCat)  return false;
+    // 'weapons' = all real weapon categories (no misc)
+    if (activeCat === 'weapons' && x.category === 'misc') return false;
+    if (activeCat && activeCat !== 'weapons' && x.category !== activeCat) return false;
     if (activeSt === 'st'   && !x.st) return false;
     if (activeSt === 'norm' &&  x.st) return false;
     return true;
   });
 
-  filtered.sort((a,b) => ({
-    'disc_d': () => b.discount - a.discount,
-    'disc_a': () => a.discount - b.discount,
-    'price_a':() => a.price - b.price,
-    'price_d':() => b.price - a.price,
-  }[sort] || (() => b.discount - a.discount))());
+  const sorters = {
+    'value':  (a,b) => dealScore(b) - dealScore(a),
+    'disc_d': (a,b) => b.discount - a.discount,
+    'disc_a': (a,b) => a.discount - b.discount,
+    'price_a':(a,b) => a.price - b.price,
+    'price_d':(a,b) => b.price - a.price,
+  };
+  filtered.sort(sorters[sort] || sorters['value']);
 
   shown = 0;
   document.getElementById('grid').innerHTML = '';
@@ -1113,15 +1139,20 @@ function buildCard(x) {
 
 // ── STATS ────────────────────────────────────────────────────────
 function updateStats() {
-  const valid = all.filter(x => x.discount > 0);
-  if (!valid.length) return;
-  const avg  = valid.reduce((s,x) => s + x.discount, 0) / valid.length;
-  const best = valid.reduce((a,x) => x.discount > a.discount ? x : a, valid[0]);
-  const cheap = [...valid].sort((a,b) => a.price - b.price)[0];
-  el('sv-deals', valid.length);
+  // Only count real weapon skins with price reference for meaningful stats
+  const weapons = all.filter(x => x.discount > 0 && x.ref && x.category !== 'misc' && x.price >= 5);
+  if (!weapons.length) return;
+  const avg     = weapons.reduce((s,x) => s + x.discount, 0) / weapons.length;
+  // Best value deal = highest dealScore
+  const bestVal = weapons.reduce((a,x) => dealScore(x) > dealScore(a) ? x : a, weapons[0]);
+  // Biggest $ saving
+  const bestSaving = weapons.reduce((a,x) => (x.ref - x.price) > (a.ref - a.price) ? x : a, weapons[0]);
+  const saving = bestSaving.ref - bestSaving.price;
+
+  el('sv-deals', weapons.length.toLocaleString());
   el('sv-avg',   '-' + avg.toFixed(1) + '%');
-  el('sv-best',  '-' + best.discount.toFixed(1) + '% · ' + best.weapon);
-  el('sv-cheap', $p(cheap.price));
+  el('sv-best',  '-' + bestVal.discount.toFixed(1) + '% · ' + bestVal.weapon);
+  el('sv-cheap', $p(bestSaving.price) + ' (-' + $p(saving) + ')');
   el('sv-total', all.length.toLocaleString());
 }
 
@@ -1167,7 +1198,15 @@ function showErr(msg) {
 function hideErr() { document.getElementById('errBanner').classList.remove('show'); }
 
 // ── BOOT ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => { onFC(); loadData(); });
+document.addEventListener('DOMContentLoaded', () => {
+  // Set defaults on DOM then boot
+  document.getElementById('fr-disc').value     = 15;
+  document.getElementById('fr-minprice').value = 15;
+  document.getElementById('fr-price').value    = 5000;
+  document.getElementById('fsort').value       = 'value';
+  onFC();
+  loadData();
+});
 </script>
 </body>
 </html>
