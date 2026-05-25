@@ -1,883 +1,692 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CS2 Skin Radar — Live Deal Scanner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:       #07090e;
-  --surface:  #0c1120;
-  --surface2: #111829;
-  --surface3: #162034;
-  --border:   #1c2c47;
-  --accent:   #e8a034;
-  --accent2:  #f0b84a;
-  --green:    #3dd68c;
-  --green2:   #22c55e;
-  --blue:     #4d9fff;
-  --red:      #ff4757;
-  --text:     #e2e8f0;
-  --muted:    #6b7f9c;
-  --muted2:   #4a5872;
+  --bg:       #020617;
+  --s1:       #080f20;
+  --s2:       #0d1a35;
+  --s3:       #121f3d;
+  --border:   #1e3054;
+  --border2:  #2a4070;
+  --gold:     #e8a034;
+  --gold2:    #f5b84a;
+  --green:    #22c55e;
+  --green2:   #4ade80;
+  --cyan:     #06b6d4;
+  --red:      #ef4444;
+  --purple:   #8b5cf6;
+  --text:     #e2eaf5;
+  --muted:    #5a7299;
+  --muted2:   #3d5478;
+  --fn-c:     #22c55e;
+  --mw-c:     #06b6d4;
+  --ft-c:     #eab308;
+  --ww-c:     #f97316;
+  --bs-c:     #ef4444;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Fira Sans', system-ui, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ── GRID BG ── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
 /* ── HEADER ── */
 .header {
-  background: linear-gradient(180deg, #0a1428 0%, var(--bg) 100%);
+  position:sticky; top:0; z-index:100;
+  background: linear-gradient(180deg, rgba(8,15,32,0.98) 0%, rgba(2,6,23,0.95) 100%);
   border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  overflow:hidden;
+}
+
+/* CRT scanline */
+.header::before {
+  content:'';
+  position:absolute; inset:0; pointer-events:none; z-index:1;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.12) 2px,
+    rgba(0,0,0,0.12) 4px
+  );
 }
 
 .header-inner {
-  max-width: 1600px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  gap: 16px;
+  position:relative; z-index:2;
+  max-width:1700px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 24px; height:60px; gap:16px;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display:flex; align-items:center; gap:12px;
 }
 
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--accent) 0%, #c97c20 100%);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
+.logo-mark {
+  width:34px; height:34px;
+  background: linear-gradient(135deg, #e8a034 0%, #c47a20 100%);
+  border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  box-shadow: 0 0 12px rgba(232,160,52,0.4);
 }
 
-.logo-text h1 {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--text);
-  line-height: 1;
+.logo-mark svg { width:18px; height:18px; fill:white; }
+
+.logo-text {
+  display:flex; flex-direction:column; gap:1px;
 }
 
-.logo-text span {
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 400;
-  letter-spacing: 0.02em;
+.logo-name {
+  font-family:'Fira Code', monospace;
+  font-size:15px; font-weight:700;
+  letter-spacing:0.12em;
+  color:var(--text);
+  text-shadow: 0 0 20px rgba(232,160,52,0.3);
+}
+
+.logo-sub {
+  font-size:10px; color:var(--muted);
+  letter-spacing:0.04em; font-weight:400;
 }
 
 .header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  display:flex; align-items:center; gap:12px;
 }
 
-.live-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(61, 214, 140, 0.1);
-  border: 1px solid rgba(61, 214, 140, 0.2);
-  border-radius: 20px;
+.live-pill {
+  display:flex; align-items:center; gap:5px;
   padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--green);
-  letter-spacing: 0.08em;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius:20px;
+  font-family:'Fira Code', monospace;
+  font-size:11px; font-weight:600;
+  color:var(--green);
+  letter-spacing:0.1em;
 }
 
 .live-dot {
-  width: 7px;
-  height: 7px;
-  background: var(--green);
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
+  width:6px; height:6px;
+  background:var(--green); border-radius:50%;
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
+@keyframes pulse-dot {
+  0%,100% { opacity:1; box-shadow:0 0 6px var(--green); }
+  50%      { opacity:0.3; box-shadow:0 0 2px var(--green); }
 }
 
-.refresh-btn {
-  background: var(--surface2);
+.update-lbl {
+  font-family:'Fira Code', monospace;
+  font-size:11px; color:var(--muted);
+}
+
+.countdown-lbl {
+  font-family:'Fira Code', monospace;
+  font-size:10px; color:var(--muted2);
+}
+
+.btn-refresh {
+  display:flex; align-items:center; gap:6px;
+  padding:6px 14px;
+  background:var(--s2);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 14px;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  border-radius:8px;
+  color:var(--text); font-size:12px; font-weight:500;
+  cursor:pointer; transition:all 0.15s;
+  font-family:'Fira Sans', system-ui;
 }
 
-.refresh-btn:hover {
-  background: var(--surface3);
-  border-color: var(--accent);
-  color: var(--accent);
+.btn-refresh:hover {
+  border-color: var(--gold); color:var(--gold);
+  box-shadow: 0 0 12px rgba(232,160,52,0.15);
 }
 
-.refresh-btn svg { transition: transform 0.4s; }
-.refresh-btn.spinning svg { animation: spin 0.8s linear infinite; }
+.btn-refresh svg { transition:transform 0.5s; }
+.btn-refresh.spin svg { animation: spin 0.7s linear infinite; }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.update-time {
-  font-size: 12px;
-  color: var(--muted);
-  font-family: 'JetBrains Mono', monospace;
-  white-space: nowrap;
-}
+@keyframes spin { to { transform:rotate(360deg); } }
 
 /* ── STATS BAR ── */
 .stats-bar {
-  background: var(--surface);
+  background: var(--s1);
   border-bottom: 1px solid var(--border);
-  padding: 0 24px;
 }
 
 .stats-inner {
-  max-width: 1600px;
-  margin: 0 auto;
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  height: 52px;
-  overflow-x: auto;
+  max-width:1700px; margin:0 auto;
+  padding:0 24px;
+  display:flex; align-items:stretch;
+  height:50px; overflow-x:auto; gap:0;
 }
 
 .stat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px;
-  border-right: 1px solid var(--border);
-  white-space: nowrap;
-  flex-shrink: 0;
+  display:flex; align-items:center; gap:10px;
+  padding:0 20px; border-right:1px solid var(--border);
+  flex-shrink:0; cursor:default;
 }
 
-.stat:first-child { padding-left: 0; }
+.stat:first-child { padding-left:0; }
 
-.stat-icon { font-size: 16px; }
-
-.stat-info { display: flex; flex-direction: column; gap: 1px; }
-
-.stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+.stat-ico {
+  width:28px; height:28px;
+  background:var(--s2); border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
 }
 
-.stat-value {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
+.stat-ico svg { width:14px; height:14px; }
+
+.stat-body { display:flex; flex-direction:column; gap:1px; }
+
+.stat-lbl {
+  font-size:9px; font-weight:600;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--muted);
 }
 
-.stat-value.green { color: var(--green); }
-.stat-value.accent { color: var(--accent); }
+.stat-val {
+  font-family:'Fira Code', monospace;
+  font-size:15px; font-weight:700;
+  color:var(--text); line-height:1;
+}
 
-/* ── SOURCES BAR ── */
+.stat-val.g { color:var(--green); }
+.stat-val.a { color:var(--gold); }
+.stat-val.c { color:var(--cyan); }
+
+/* ── SOURCES ── */
 .sources-bar {
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;
 }
 
 .sources-inner {
-  max-width: 1600px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  overflow-x: auto;
+  max-width:1700px; margin:0 auto;
+  display:flex; align-items:center;
+  height:40px; gap:6px; overflow-x:auto;
 }
 
-.sources-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-right: 4px;
-  white-space: nowrap;
+.src-lbl {
+  font-size:10px; font-weight:600;
+  color:var(--muted); letter-spacing:0.08em;
+  text-transform:uppercase; white-space:nowrap;
+  margin-right:4px;
 }
 
-.source-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  border: 1px solid;
-  white-space: nowrap;
-  transition: all 0.15s;
-  cursor: pointer;
+.src-chip {
+  display:flex; align-items:center; gap:4px;
+  padding:3px 9px; border-radius:20px;
+  font-size:11px; font-weight:600;
+  text-decoration:none; border:1px solid;
+  white-space:nowrap; transition:all 0.15s;
+  cursor:pointer;
 }
 
-.source-chip.live {
-  background: rgba(61, 214, 140, 0.07);
-  border-color: rgba(61, 214, 140, 0.25);
-  color: var(--green);
+.src-chip.live {
+  color:var(--green);
+  background:rgba(34,197,94,0.06);
+  border-color:rgba(34,197,94,0.2);
 }
 
-.source-chip.live:hover {
-  background: rgba(61, 214, 140, 0.15);
+.src-chip.live:hover { background:rgba(34,197,94,0.12); }
+
+.src-chip.ref {
+  color:var(--cyan);
+  background:rgba(6,182,212,0.06);
+  border-color:rgba(6,182,212,0.2);
 }
 
-.source-chip.ref {
-  background: rgba(77, 159, 255, 0.07);
-  border-color: rgba(77, 159, 255, 0.25);
-  color: var(--blue);
+.src-chip.soon {
+  color:var(--muted2);
+  background:rgba(94,116,153,0.06);
+  border-color:rgba(94,116,153,0.15);
 }
 
-.source-chip.soon {
-  background: rgba(107, 127, 156, 0.07);
-  border-color: rgba(107, 127, 156, 0.2);
-  color: var(--muted);
+.src-dot {
+  width:5px; height:5px;
+  border-radius:50%; background:currentColor; flex-shrink:0;
 }
 
-.source-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-}
-
-.source-chip.live .source-dot { animation: pulse 2s ease-in-out infinite; }
+.src-chip.live .src-dot { animation:pulse-dot 2s ease-in-out infinite; }
 
 /* ── MAIN LAYOUT ── */
 .main {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 20px 24px;
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 20px;
-  align-items: start;
+  max-width:1700px; margin:0 auto;
+  padding:20px 24px;
+  display:grid; grid-template-columns:252px 1fr;
+  gap:18px; align-items:start;
+  position:relative; z-index:1;
 }
 
-/* ── FILTERS SIDEBAR ── */
-.filters-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  position: sticky;
-  top: 84px;
+/* ── SIDEBAR ── */
+.sidebar {
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  position:sticky; top:78px;
 }
 
-.filters-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.sidebar-title {
+  font-size:10px; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:14px;
+  display:flex; align-items:center; justify-content:space-between;
 }
 
-.reset-btn {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--accent);
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  letter-spacing: 0;
-  text-transform: none;
+.reset-lnk {
+  font-size:11px; font-weight:500;
+  color:var(--gold); letter-spacing:0; text-transform:none;
+  cursor:pointer; background:none; border:none;
+  font-family:'Fira Sans', system-ui;
 }
 
-.reset-btn:hover { opacity: 0.7; }
+.reset-lnk:hover { opacity:0.7; }
 
-.filter-group {
-  margin-bottom: 18px;
+.fg { margin-bottom:16px; }
+
+.fl {
+  font-size:11px; font-weight:600;
+  color:var(--muted); margin-bottom:7px;
+  display:flex; align-items:center; justify-content:space-between;
 }
 
-.filter-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.fl .fv {
+  font-family:'Fira Code', monospace;
+  font-size:12px; color:var(--gold);
 }
 
-.filter-label .val {
-  color: var(--accent);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+/* Range slider */
+input[type=range] {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:3px;
+  background:var(--border2); border-radius:2px;
+  outline:none; cursor:pointer;
 }
 
-.filter-range {
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--border);
-  outline: none;
-  cursor: pointer;
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none;
+  width:14px; height:14px;
+  border-radius:50%;
+  background:var(--gold);
+  cursor:pointer;
+  box-shadow:0 0 8px rgba(232,160,52,0.5);
+  transition:transform 0.1s;
 }
 
-.filter-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  transition: transform 0.1s;
-}
+input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
 
-.filter-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.sep { height:1px; background:var(--border); margin:14px 0; }
 
-.filter-select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: 'Inter', system-ui;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.filter-select:hover, .filter-select:focus { border-color: var(--accent); }
-
-.filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
+.chips { display:flex; flex-wrap:wrap; gap:4px; }
 
 .chip {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  color: var(--muted);
-  transition: all 0.15s;
-  user-select: none;
+  padding:3px 9px; border-radius:5px;
+  font-size:10px; font-weight:600;
+  cursor:pointer; user-select:none;
+  border:1px solid var(--border);
+  background:var(--s2); color:var(--muted);
+  transition:all 0.12s;
 }
 
-.chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.chip:hover { border-color:var(--gold); color:var(--gold); }
+
+.chip.on {
+  background:rgba(232,160,52,0.1);
+  border-color:var(--gold); color:var(--gold);
+  box-shadow:0 0 8px rgba(232,160,52,0.15);
 }
 
-.chip.active {
-  background: rgba(232, 160, 52, 0.12);
-  border-color: var(--accent);
-  color: var(--accent);
+.fselect {
+  width:100%; padding:7px 10px;
+  background:var(--s2);
+  border:1px solid var(--border); border-radius:7px;
+  color:var(--text); font-size:12px;
+  font-family:'Fira Sans', system-ui;
+  cursor:pointer; outline:none;
+  transition:border-color 0.15s;
 }
 
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 14px 0;
+.fselect:hover, .fselect:focus { border-color:var(--gold); }
+
+/* ── CONTENT ── */
+.content { min-width:0; }
+
+.ct-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px; flex-wrap:wrap; gap:8px;
 }
 
-/* ── CONTENT AREA ── */
-.content { min-width: 0; }
-
-.content-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  gap: 12px;
-  flex-wrap: wrap;
+.ct-count {
+  font-size:13px; color:var(--muted);
 }
 
-.results-count {
-  font-size: 14px;
-  color: var(--muted);
+.ct-count strong { color:var(--text); font-weight:700; }
+
+/* ── ERROR BANNER ── */
+.err-banner {
+  display:none;
+  align-items:center; gap:10px;
+  padding:11px 16px; margin-bottom:14px;
+  background:rgba(239,68,68,0.08);
+  border:1px solid rgba(239,68,68,0.25);
+  border-radius:9px;
+  font-size:13px; color:#fca5a5;
 }
 
-.results-count strong {
-  color: var(--text);
-  font-weight: 700;
+.err-banner.show { display:flex; }
+
+.err-banner svg { flex-shrink:0; }
+
+/* ── GRID ── */
+.grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap:12px;
 }
 
-.sort-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* ── CARD ── */
+.card {
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:11px; overflow:hidden;
+  transition:all 0.2s ease;
+  position:relative;
 }
 
-.sort-label {
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
+.card:hover {
+  border-color:rgba(232,160,52,0.45);
+  transform:translateY(-3px);
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(232,160,52,0.1),
+    0 0 20px rgba(232,160,52,0.06);
 }
 
-/* ── SKIN GRID ── */
-.skin-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+.card.hot { border-color:rgba(239,68,68,0.3); }
+.card.hot:hover { border-color:rgba(239,68,68,0.6); }
+
+/* Card image area */
+.card-img {
+  background: linear-gradient(135deg, #050e1e 0%, #090f22 50%, #060c1a 100%);
+  height:124px; position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
 }
 
-/* ── SKIN CARD ── */
-.skin-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.2s;
-  cursor: default;
-  position: relative;
+.card-img::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at 50% 70%, rgba(232,160,52,0.06) 0%, transparent 65%);
 }
 
-.skin-card:hover {
-  border-color: rgba(232, 160, 52, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(232, 160, 52, 0.1);
-}
-
-.skin-card.hot { border-color: rgba(255, 71, 87, 0.4); }
-.skin-card.hot:hover { border-color: var(--red); }
-
-.card-img-area {
-  background: linear-gradient(135deg, #0f1826 0%, #0a1220 100%);
-  height: 130px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.card-img-area::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 60%, rgba(232,160,52,0.06) 0%, transparent 70%);
+/* CRT scanline on card image */
+.card-img::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:2;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+  );
 }
 
 .item-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 12px;
-  position: relative;
-  z-index: 1;
+  width:100%; height:100%; object-fit:contain;
+  padding:10px; position:relative; z-index:1;
+  transition:transform 0.2s;
 }
 
-.item-img-fallback {
-  font-size: 48px;
-  position: relative;
-  z-index: 1;
-  opacity: 0.6;
-  user-select: none;
+.card:hover .item-img { transform:scale(1.04); }
+
+.img-fallback {
+  position:relative; z-index:1;
+  display:none; align-items:center; justify-content:center;
 }
 
-.discount-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(61, 214, 140, 0.15);
-  border: 1px solid rgba(61, 214, 140, 0.3);
-  border-radius: 6px;
-  padding: 2px 7px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--green);
-  font-family: 'JetBrains Mono', monospace;
-  z-index: 2;
+.img-fallback svg {
+  width:52px; height:52px;
+  opacity:0.2;
 }
 
-.discount-badge.fire {
-  background: rgba(255, 71, 87, 0.15);
-  border-color: rgba(255, 71, 87, 0.35);
-  color: var(--red);
+.badge-disc {
+  position:absolute; top:7px; right:7px; z-index:3;
+  padding:2px 7px; border-radius:5px;
+  font-family:'Fira Code', monospace;
+  font-size:11px; font-weight:700;
 }
 
-.discount-badge.hot {
-  background: rgba(232, 160, 52, 0.15);
-  border-color: rgba(232, 160, 52, 0.35);
-  color: var(--accent);
+.badge-disc.green {
+  background:rgba(34,197,94,0.15);
+  border:1px solid rgba(34,197,94,0.3);
+  color:var(--green);
+  text-shadow:0 0 8px var(--green);
 }
 
-.stattrak-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(232, 160, 52, 0.15);
-  border: 1px solid rgba(232, 160, 52, 0.3);
-  border-radius: 4px;
-  padding: 2px 5px;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: 0.05em;
-  z-index: 2;
+.badge-disc.gold {
+  background:rgba(232,160,52,0.15);
+  border:1px solid rgba(232,160,52,0.3);
+  color:var(--gold);
+  text-shadow:0 0 8px var(--gold);
 }
 
-.card-body {
-  padding: 12px;
+.badge-disc.red {
+  background:rgba(239,68,68,0.15);
+  border:1px solid rgba(239,68,68,0.35);
+  color:#fca5a5;
+  text-shadow:0 0 8px rgba(239,68,68,0.6);
 }
+
+.badge-st {
+  position:absolute; top:7px; left:7px; z-index:3;
+  padding:2px 5px; border-radius:4px;
+  font-size:8px; font-weight:700;
+  letter-spacing:0.05em;
+  background:rgba(232,160,52,0.12);
+  border:1px solid rgba(232,160,52,0.25);
+  color:var(--gold);
+}
+
+/* Card body */
+.card-body { padding:11px 12px; }
 
 .card-weapon {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 2px;
+  font-size:9px; font-weight:600;
+  color:var(--muted); text-transform:uppercase;
+  letter-spacing:0.1em; margin-bottom:2px;
 }
 
 .card-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.3;
-  margin-bottom: 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size:13px; font-weight:700;
+  color:var(--text); line-height:1.3;
+  margin-bottom:6px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-.card-condition {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 7px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  margin-bottom: 10px;
+.card-cond {
+  display:inline-flex; align-items:center;
+  padding:2px 7px; border-radius:4px;
+  font-size:9px; font-weight:700;
+  letter-spacing:0.06em; margin-bottom:9px;
 }
 
-.cond-fn { background: rgba(61,214,140,0.12); color: #3dd68c; }
-.cond-mw { background: rgba(77,159,255,0.12); color: #4d9fff; }
-.cond-ft { background: rgba(250,204,21,0.12); color: #facc15; }
-.cond-ww { background: rgba(249,115,22,0.12); color: #f97316; }
-.cond-bs { background: rgba(255,71,87,0.12); color: #ff4757; }
+.cond-fn { background:rgba(34,197,94,0.1); color:var(--fn-c); border:1px solid rgba(34,197,94,0.2); }
+.cond-mw { background:rgba(6,182,212,0.1); color:var(--mw-c); border:1px solid rgba(6,182,212,0.2); }
+.cond-ft { background:rgba(234,179,8,0.1); color:var(--ft-c); border:1px solid rgba(234,179,8,0.2); }
+.cond-ww { background:rgba(249,115,22,0.1); color:var(--ww-c); border:1px solid rgba(249,115,22,0.2); }
+.cond-bs { background:rgba(239,68,68,0.1); color:var(--bs-c); border:1px solid rgba(239,68,68,0.2); }
 
 .price-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  display:flex; align-items:flex-end;
+  justify-content:space-between; margin-bottom:8px;
 }
 
 .price-main {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--green);
-  font-family: 'JetBrains Mono', monospace;
-  line-height: 1;
+  font-family:'Fira Code', monospace;
+  font-size:20px; font-weight:700;
+  color:var(--green); line-height:1;
+  text-shadow:0 0 16px rgba(34,197,94,0.3);
 }
+
+.price-ref-wrap { text-align:right; }
 
 .price-ref {
-  font-size: 11px;
-  color: var(--muted);
-  font-family: 'JetBrains Mono', monospace;
-  text-decoration: line-through;
-  text-align: right;
+  font-family:'Fira Code', monospace;
+  font-size:11px; color:var(--muted);
+  text-decoration:line-through; display:block;
 }
 
-.price-ref-label {
-  font-size: 9px;
-  color: var(--muted2);
-  text-decoration: none;
-  display: block;
-  font-family: 'Inter', system-ui;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.price-ref-lbl {
+  font-size:9px; color:var(--muted2);
+  text-transform:uppercase; letter-spacing:0.06em;
+  font-weight:600;
 }
 
-.qty {
-  font-size: 11px;
-  color: var(--muted);
-  margin-bottom: 10px;
+.card-qty {
+  font-size:11px; color:var(--muted);
+  margin-bottom:9px;
 }
 
-.qty span { color: var(--text); font-weight: 600; }
+.card-qty span { color:var(--text); font-weight:600; }
 
-.buy-btn {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  background: linear-gradient(135deg, rgba(232,160,52,0.15) 0%, rgba(232,160,52,0.08) 100%);
-  border: 1px solid rgba(232,160,52,0.3);
-  border-radius: 8px;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
-  text-decoration: none;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: all 0.15s;
-  cursor: pointer;
+.card-sep { height:1px; background:var(--border); margin:8px 0; }
+
+.card-links { display:flex; gap:4px; margin-bottom:8px; }
+
+.card-lnk {
+  font-size:10px; font-weight:600;
+  color:var(--muted); text-decoration:none;
+  padding:2px 7px; border:1px solid var(--border);
+  border-radius:4px; transition:all 0.12s;
 }
 
-.buy-btn:hover {
-  background: rgba(232,160,52,0.25);
-  border-color: var(--accent);
+.card-lnk:hover { color:var(--text); border-color:var(--muted); }
+
+.card-cta {
+  display:block; width:100%; padding:8px;
+  background:linear-gradient(135deg, rgba(232,160,52,0.12) 0%, rgba(232,160,52,0.07) 100%);
+  border:1px solid rgba(232,160,52,0.28);
+  border-radius:7px;
+  color:var(--gold); font-size:11px; font-weight:700;
+  text-align:center; text-decoration:none;
+  letter-spacing:0.08em; text-transform:uppercase;
+  transition:all 0.15s; cursor:pointer;
 }
 
-.card-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 10px 0;
-}
-
-.card-sources {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.source-link {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 2px 6px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  transition: all 0.15s;
-}
-
-.source-link:hover {
-  color: var(--text);
-  border-color: var(--muted);
-}
-
-/* ── LOADING ── */
-.loading-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(7,9,14,0.8);
-  backdrop-filter: blur(4px);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.loading-overlay.active { display: flex; }
-
-.loading-spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-.loading-text {
-  font-size: 14px;
-  color: var(--muted);
+.card-cta:hover {
+  background:rgba(232,160,52,0.22);
+  border-color:var(--gold);
+  box-shadow:0 0 16px rgba(232,160,52,0.2);
 }
 
 /* ── SKELETON ── */
-.skeleton {
-  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
+.skel {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:11px; overflow:hidden; height:280px;
 }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.skel-inner {
+  height:100%;
+  background: linear-gradient(90deg, var(--s1) 25%, var(--s2) 50%, var(--s1) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
 }
 
-.skeleton-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ── EMPTY ── */
+.empty {
+  grid-column:1/-1; padding:60px 20px;
+  text-align:center; color:var(--muted);
 }
 
-/* ── EMPTY STATE ── */
-.empty-state {
-  grid-column: 1 / -1;
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--muted);
-}
-
-.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-.empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 6px; }
-.empty-state p { font-size: 14px; }
-
-/* ── ERROR STATE ── */
-.error-banner {
-  display: none;
-  background: rgba(255, 71, 87, 0.1);
-  border: 1px solid rgba(255, 71, 87, 0.3);
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 13px;
-  color: var(--red);
-  margin-bottom: 16px;
-  align-items: center;
-  gap: 8px;
-}
-
-.error-banner.visible { display: flex; }
-
-/* ── COUNTDOWN ── */
-.countdown {
-  font-size: 11px;
-  color: var(--muted2);
-  font-family: 'JetBrains Mono', monospace;
-}
+.empty svg { width:48px; height:48px; opacity:0.3; margin-bottom:12px; }
+.empty h3 { font-size:17px; color:var(--text); margin-bottom:6px; }
+.empty p { font-size:13px; }
 
 /* ── LOAD MORE ── */
-.load-more-wrap {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
-}
+.load-more-wrap { display:flex; justify-content:center; margin-top:20px; }
 
 .load-more-btn {
-  padding: 10px 28px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
+  padding:9px 28px;
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:8px; color:var(--text);
+  font-size:13px; font-weight:600; cursor:pointer;
+  transition:all 0.15s;
+  font-family:'Fira Sans', system-ui;
 }
 
-.load-more-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+.load-more-btn:hover { border-color:var(--gold); color:var(--gold); }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  .main {
-    grid-template-columns: 1fr;
-    padding: 12px 16px;
-  }
-
-  .filters-panel {
-    position: static;
-  }
-
-  .header-inner {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 12px 0;
-  }
-
-  .update-time { display: none; }
-  .stats-inner { height: auto; padding: 8px 0; flex-wrap: wrap; }
-  .stat { height: 44px; }
+@media (max-width:960px) {
+  .main { grid-template-columns:1fr; padding:12px 16px; }
+  .sidebar { position:static; }
+  .header-inner { height:auto; padding:10px 16px; flex-wrap:wrap; }
+  .update-lbl, .countdown-lbl { display:none; }
 }
 
-@media (max-width: 480px) {
-  .skin-grid { grid-template-columns: 1fr 1fr; }
-  .sources-inner { gap: 4px; }
-  .logo-text h1 { font-size: 14px; }
+@media (max-width:520px) {
+  .grid { grid-template-columns:1fr 1fr; }
+  .stat { padding:0 14px; }
 }
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
-
-/* ── NOTICE BAR ── */
-.notice-bar {
-  background: rgba(77, 159, 255, 0.08);
-  border-bottom: 1px solid rgba(77, 159, 255, 0.2);
-  padding: 8px 24px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--blue);
-}
-
-.notice-bar a { color: var(--blue); text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text" id="loadingText">Escaneando mercado...</div>
-</div>
-
-<!-- Header -->
+<!-- ── HEADER ── -->
 <header class="header">
   <div class="header-inner">
     <div class="logo">
-      <div class="logo-icon">🎯</div>
+      <div class="logo-mark">
+        <!-- crosshair icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="3" fill="white"/>
+          <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5" fill="none" opacity="0.5"/>
+        </svg>
+      </div>
       <div class="logo-text">
-        <h1>CS2 SKIN RADAR</h1>
-        <span>Scanner de preços abaixo do mercado • Ao vivo</span>
+        <div class="logo-name">CS2 SKIN RADAR</div>
+        <div class="logo-sub">Scanner de preços abaixo do mercado • Ao vivo</div>
       </div>
     </div>
     <div class="header-right">
-      <div class="live-badge">
-        <div class="live-dot"></div>
-        LIVE
-      </div>
-      <div class="update-time" id="updateTime">Carregando...</div>
-      <div class="countdown" id="countdown"></div>
-      <button class="refresh-btn" id="refreshBtn" onclick="refresh()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="23 4 23 10 17 10"></polyline>
-          <polyline points="1 20 1 14 7 14"></polyline>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+      <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+      <div class="update-lbl" id="updateLbl">Carregando...</div>
+      <div class="countdown-lbl" id="countdownLbl"></div>
+      <button class="btn-refresh" id="btnRefresh" onclick="refresh()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
         </svg>
         Atualizar
       </button>
@@ -885,632 +694,458 @@ body {
   </div>
 </header>
 
-<!-- Stats bar -->
+<!-- ── STATS ── -->
 <div class="stats-bar">
-  <div class="stats-inner" id="statsBar">
+  <div class="stats-inner">
     <div class="stat">
-      <div class="stat-icon">💰</div>
-      <div class="stat-info">
-        <div class="stat-label">Deals encontradas</div>
-        <div class="stat-value" id="statDeals">—</div>
+      <div class="stat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e8a034" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-lbl">Deals encontradas</div>
+        <div class="stat-val a" id="sv-deals">—</div>
       </div>
     </div>
     <div class="stat">
-      <div class="stat-icon">📉</div>
-      <div class="stat-info">
-        <div class="stat-label">Desconto médio</div>
-        <div class="stat-value green" id="statAvgDiscount">—</div>
+      <div class="stat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-lbl">Desconto médio</div>
+        <div class="stat-val g" id="sv-avg">—</div>
       </div>
     </div>
     <div class="stat">
-      <div class="stat-icon">🔥</div>
-      <div class="stat-info">
-        <div class="stat-label">Maior desconto</div>
-        <div class="stat-value accent" id="statBestDiscount">—</div>
+      <div class="stat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-lbl">Maior desconto</div>
+        <div class="stat-val a" id="sv-best">—</div>
       </div>
     </div>
     <div class="stat">
-      <div class="stat-icon">🏷️</div>
-      <div class="stat-info">
-        <div class="stat-label">Mais barato</div>
-        <div class="stat-value" id="statCheapest">—</div>
+      <div class="stat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-lbl">Mais barato</div>
+        <div class="stat-val c" id="sv-cheap">—</div>
       </div>
     </div>
     <div class="stat">
-      <div class="stat-icon">📦</div>
-      <div class="stat-info">
-        <div class="stat-label">Total no mercado</div>
-        <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#5a7299" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-lbl">Total no mercado</div>
+        <div class="stat-val" id="sv-total">—</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Sources bar -->
+<!-- ── SOURCES ── -->
 <div class="sources-bar">
   <div class="sources-inner">
-    <span class="sources-label">Fontes:</span>
-    <a class="source-chip live" href="https://skinport.com" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      Skinport
+    <span class="src-lbl">Fontes:</span>
+    <a class="src-chip live" href="https://skinport.com" target="_blank" rel="noopener">
+      <div class="src-dot"></div>Skinport
     </a>
-    <div class="source-chip ref">
-      <div class="source-dot"></div>
-      Steam (referência)
+    <div class="src-chip ref">
+      <div class="src-dot"></div>Steam (ref.)
     </div>
-    <a class="source-chip soon" href="https://cs.money" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      CS.MONEY
-    </a>
-    <a class="source-chip soon" href="https://dmarket.com" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      DMarket
-    </a>
-    <a class="source-chip soon" href="https://bitskins.com" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      BitSkins
-    </a>
-    <a class="source-chip soon" href="https://waxpeer.com" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      Waxpeer
-    </a>
-    <a class="source-chip soon" href="https://buff.163.com" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      Buff163
-    </a>
-    <a class="source-chip soon" href="https://skinbaron.de" target="_blank" rel="noopener">
-      <div class="source-dot"></div>
-      SkinBaron
-    </a>
+    <a class="src-chip soon" href="https://cs.money" target="_blank" rel="noopener"><div class="src-dot"></div>CS.MONEY</a>
+    <a class="src-chip soon" href="https://dmarket.com" target="_blank" rel="noopener"><div class="src-dot"></div>DMarket</a>
+    <a class="src-chip soon" href="https://bitskins.com" target="_blank" rel="noopener"><div class="src-dot"></div>BitSkins</a>
+    <a class="src-chip soon" href="https://waxpeer.com" target="_blank" rel="noopener"><div class="src-dot"></div>Waxpeer</a>
+    <a class="src-chip soon" href="https://buff.163.com" target="_blank" rel="noopener"><div class="src-dot"></div>Buff163</a>
+    <a class="src-chip soon" href="https://skinbaron.de" target="_blank" rel="noopener"><div class="src-dot"></div>SkinBaron</a>
   </div>
 </div>
 
-<!-- Main content -->
+<!-- ── MAIN ── -->
 <div class="main">
 
-  <!-- Filters sidebar -->
-  <aside class="filters-panel">
-    <div class="filters-title">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-title">
       Filtros
-      <button class="reset-btn" onclick="resetFilters()">Resetar</button>
+      <button class="reset-lnk" onclick="resetFilters()">Resetar</button>
     </div>
 
-    <!-- Min discount -->
-    <div class="filter-group">
-      <div class="filter-label">
-        Desconto mínimo
-        <span class="val" id="discountVal">10%</span>
-      </div>
-      <input type="range" class="filter-range" id="discountRange"
-        min="0" max="70" value="10" step="1"
-        oninput="onFilterChange()">
+    <div class="fg">
+      <div class="fl">Desconto mínimo <span class="fv" id="fv-disc">10%</span></div>
+      <input type="range" id="fr-disc" min="0" max="70" value="10" step="1" oninput="onFC()">
     </div>
 
-    <!-- Max price -->
-    <div class="filter-group">
-      <div class="filter-label">
-        Preço máximo
-        <span class="val" id="priceVal">$500</span>
-      </div>
-      <input type="range" class="filter-range" id="priceRange"
-        min="1" max="2000" value="500" step="1"
-        oninput="onFilterChange()">
+    <div class="fg">
+      <div class="fl">Preço máximo <span class="fv" id="fv-price">$500</span></div>
+      <input type="range" id="fr-price" min="1" max="2000" value="500" step="1" oninput="onFC()">
     </div>
 
-    <div class="divider"></div>
+    <div class="sep"></div>
 
-    <!-- Condition -->
-    <div class="filter-group">
-      <div class="filter-label">Condição</div>
-      <div class="filter-chips" id="condChips">
-        <div class="chip active" data-cond="" onclick="toggleCond(this)">Todas</div>
-        <div class="chip" data-cond="Factory New" onclick="toggleCond(this)">FN</div>
-        <div class="chip" data-cond="Minimal Wear" onclick="toggleCond(this)">MW</div>
-        <div class="chip" data-cond="Field-Tested" onclick="toggleCond(this)">FT</div>
-        <div class="chip" data-cond="Well-Worn" onclick="toggleCond(this)">WW</div>
-        <div class="chip" data-cond="Battle-Scarred" onclick="toggleCond(this)">BS</div>
+    <div class="fg">
+      <div class="fl">Condição</div>
+      <div class="chips" id="chips-cond">
+        <div class="chip on" data-v="" onclick="pickCond(this)">Todas</div>
+        <div class="chip" data-v="Factory New" onclick="pickCond(this)">FN</div>
+        <div class="chip" data-v="Minimal Wear" onclick="pickCond(this)">MW</div>
+        <div class="chip" data-v="Field-Tested" onclick="pickCond(this)">FT</div>
+        <div class="chip" data-v="Well-Worn" onclick="pickCond(this)">WW</div>
+        <div class="chip" data-v="Battle-Scarred" onclick="pickCond(this)">BS</div>
       </div>
     </div>
 
-    <!-- Category -->
-    <div class="filter-group">
-      <div class="filter-label">Categoria</div>
-      <div class="filter-chips" id="catChips">
-        <div class="chip active" data-cat="" onclick="toggleCat(this)">Todas</div>
-        <div class="chip" data-cat="rifles" onclick="toggleCat(this)">Rifles</div>
-        <div class="chip" data-cat="pistols" onclick="toggleCat(this)">Pistolas</div>
-        <div class="chip" data-cat="knives" onclick="toggleCat(this)">Facas</div>
-        <div class="chip" data-cat="gloves" onclick="toggleCat(this)">Luvas</div>
-        <div class="chip" data-cat="smgs" onclick="toggleCat(this)">SMGs</div>
-        <div class="chip" data-cat="snipers" onclick="toggleCat(this)">Sniper</div>
-        <div class="chip" data-cat="shotguns" onclick="toggleCat(this)">Shotgun</div>
-        <div class="chip" data-cat="heavy" onclick="toggleCat(this)">Heavy</div>
+    <div class="fg">
+      <div class="fl">Categoria</div>
+      <div class="chips" id="chips-cat">
+        <div class="chip on" data-v="" onclick="pickCat(this)">Todas</div>
+        <div class="chip" data-v="rifles" onclick="pickCat(this)">Rifles</div>
+        <div class="chip" data-v="pistols" onclick="pickCat(this)">Pistolas</div>
+        <div class="chip" data-v="knives" onclick="pickCat(this)">Facas</div>
+        <div class="chip" data-v="gloves" onclick="pickCat(this)">Luvas</div>
+        <div class="chip" data-v="smgs" onclick="pickCat(this)">SMGs</div>
+        <div class="chip" data-v="snipers" onclick="pickCat(this)">Sniper</div>
+        <div class="chip" data-v="shotguns" onclick="pickCat(this)">Shotgun</div>
+        <div class="chip" data-v="heavy" onclick="pickCat(this)">Heavy</div>
       </div>
     </div>
 
-    <!-- StatTrak -->
-    <div class="filter-group">
-      <div class="filter-label">Tipo</div>
-      <div class="filter-chips" id="stChips">
-        <div class="chip active" data-st="" onclick="toggleSt(this)">Todos</div>
-        <div class="chip" data-st="stattrak" onclick="toggleSt(this)">StatTrak™</div>
-        <div class="chip" data-st="normal" onclick="toggleSt(this)">Normal</div>
+    <div class="fg">
+      <div class="fl">Tipo</div>
+      <div class="chips" id="chips-st">
+        <div class="chip on" data-v="" onclick="pickSt(this)">Todos</div>
+        <div class="chip" data-v="st" onclick="pickSt(this)">StatTrak™</div>
+        <div class="chip" data-v="norm" onclick="pickSt(this)">Normal</div>
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="sep"></div>
 
-    <!-- Sort -->
-    <div class="filter-group">
-      <div class="filter-label">Ordenar por</div>
-      <select class="filter-select" id="sortSelect" onchange="onFilterChange()">
-        <option value="discount_desc">Maior desconto</option>
-        <option value="price_asc">Menor preço</option>
-        <option value="price_desc">Maior preço</option>
-        <option value="discount_asc">Menor desconto</option>
+    <div class="fg">
+      <div class="fl">Ordenar por</div>
+      <select class="fselect" id="fsort" onchange="onFC()">
+        <option value="disc_d">Maior desconto</option>
+        <option value="price_a">Menor preço</option>
+        <option value="price_d">Maior preço</option>
+        <option value="disc_a">Menor desconto</option>
       </select>
     </div>
   </aside>
 
-  <!-- Cards area -->
+  <!-- Content -->
   <div class="content">
-    <div class="error-banner" id="errorBanner">
-      ⚠️ <span id="errorMsg">Erro ao carregar dados</span>
+    <div class="err-banner" id="errBanner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errMsg">Erro</span>
     </div>
 
-    <div class="content-header">
-      <div class="results-count" id="resultsCount">
-        <strong id="visibleCount">0</strong> skins abaixo do mercado
-      </div>
+    <div class="ct-hdr">
+      <div class="ct-count"><strong id="ct-num">0</strong> skins abaixo do mercado</div>
     </div>
 
-    <div class="skin-grid" id="skinGrid">
-      <!-- Skeleton cards -->
-      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
-      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
-      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
-      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
-      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
-      <div class="skeleton-card" style="height:280px"><div class="skeleton" style="height:100%"></div></div>
+    <div class="grid" id="grid">
+      <div class="skel"><div class="skel-inner"></div></div>
+      <div class="skel"><div class="skel-inner"></div></div>
+      <div class="skel"><div class="skel-inner"></div></div>
+      <div class="skel"><div class="skel-inner"></div></div>
+      <div class="skel"><div class="skel-inner"></div></div>
+      <div class="skel"><div class="skel-inner"></div></div>
     </div>
 
-    <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+    <div class="load-more-wrap" id="lmWrap" style="display:none">
       <button class="load-more-btn" onclick="loadMore()">Carregar mais</button>
     </div>
   </div>
+
 </div>
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────
-const PAGE_SIZE = 48;
-const REFRESH_INTERVAL = 3 * 60 * 1000; // 3 min
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-const SKINPORT_URL = 'https://api.skinport.com/v1/items?app_id=730&currency=USD';
+const BASE_URL   = 'https://api.skinport.com/v1/items?app_id=730&currency=USD';
+const PAGE_SZ    = 48;
+const REFRESH_MS = 3 * 60 * 1000;
+
+// Try multiple CORS strategies
+const fetchers = [
+  () => fetch(BASE_URL, { signal: AbortSignal.timeout(10000) }),
+  () => fetch('https://corsproxy.io/?' + encodeURIComponent(BASE_URL), { signal: AbortSignal.timeout(15000) }),
+  () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(BASE_URL), { signal: AbortSignal.timeout(15000) }),
+  () => fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(BASE_URL), { signal: AbortSignal.timeout(15000) }),
+];
 
 // ── STATE ────────────────────────────────────────────────────────
-let allItems = [];
-let filteredItems = [];
-let displayedCount = 0;
-let lastFetchTime = null;
-let countdownInterval = null;
-let refreshTimeout = null;
+let all = [], filtered = [], shown = 0;
+let activeCond = '', activeCat = '', activeSt = '';
+let lastFetch = null, cTimer = null, rTimer = null;
 
-// ── WEAPON CLASSIFICATION ────────────────────────────────────────
-const CATEGORIES = {
-  rifles:   ['AK-47','M4A4','M4A1-S','AWP','FAMAS','Galil AR','AUG','SG 553','SCAR-20','G3SG1','SSG 08'],
-  pistols:  ['Desert Eagle','USP-S','Glock-18','P250','Five-SeveN','Tec-9','CZ75-Auto','P2000','Dual Berettas','R8 Revolver'],
-  smgs:     ['MP9','MAC-10','UMP-45','PP-Bizon','P90','MP7','MP5-SD'],
-  shotguns: ['Nova','XM1014','MAG-7','Sawed-Off'],
-  heavy:    ['Negev','M249'],
-  snipers:  ['AWP','SSG 08','SCAR-20','G3SG1'],
-  knives:   ['Karambit','Bayonet','M9 Bayonet','Butterfly','Falchion','Flip Knife','Gut Knife','Huntsman','Shadow Daggers','Navaja','Stiletto','Talon','Ursus','Paracord','Survival Knife','Nomad','Skeleton','Classic Knife','Kukri','Hook Knife'],
-  gloves:   ['Gloves','Wraps','Hand Wraps'],
-};
-
-const CAT_EMOJI = {
-  rifles: '🔫', pistols: '🔫', smgs: '🔫', shotguns: '🔫',
-  heavy: '💣', snipers: '🎯', knives: '🔪', gloves: '🧤', other: '📦',
-};
-
-function getCategory(name) {
-  // Knives and gloves first (★ prefix)
+// ── CATEGORIES ──────────────────────────────────────────────────
+function cat(name) {
   if (/Gloves|Wraps|Hand Wrap/i.test(name)) return 'gloves';
-  if (/Karambit|Bayonet|M9 Bay|Butterfly|Falchion|Flip Knife|Gut Knife|Huntsman|Shadow Dag|Navaja|Stiletto|Talon|Ursus|Paracord|Survival|Nomad|Skeleton|Classic Knife|Kukri|Hook Knife/i.test(name)) return 'knives';
-  // Snipers (check before rifles since AWP is in both)
-  if (/\b(AWP|SSG 08|SCAR-20|G3SG1)\b/i.test(name)) return 'snipers';
-  for (const [cat, weapons] of Object.entries(CATEGORIES)) {
-    if (cat === 'knives' || cat === 'gloves' || cat === 'snipers') continue;
-    if (weapons.some(w => name.includes(w))) return cat;
-  }
+  if (/Karambit|Bayonet|Butterfly|Falchion|Flip Knife|Gut Knife|Huntsman|Shadow Dag|Navaja|Stiletto|Talon|Ursus|Paracord|Survival Knife|Nomad Knife|Skeleton|Classic Knife|Kukri|Hook/i.test(name)) return 'knives';
+  if (/\b(AWP|SSG 08|SCAR-20|G3SG1)\b/.test(name)) return 'snipers';
+  if (/\b(AK-47|M4A4|M4A1-S|FAMAS|Galil AR|AUG|SG 553)\b/.test(name)) return 'rifles';
+  if (/\b(Desert Eagle|USP-S|Glock-18|P250|Five-SeveN|Tec-9|CZ75|P2000|Dual Berettas|R8 Revolver)\b/.test(name)) return 'pistols';
+  if (/\b(MP9|MAC-10|UMP-45|PP-Bizon|P90|MP7|MP5-SD)\b/.test(name)) return 'smgs';
+  if (/\b(Nova|XM1014|MAG-7|Sawed-Off)\b/.test(name)) return 'shotguns';
+  if (/\b(Negev|M249)\b/.test(name)) return 'heavy';
   if (name.startsWith('★')) return 'knives';
   return 'other';
 }
 
-function getCondition(name) {
+function cond(name) {
   const m = name.match(/\((Factory New|Minimal Wear|Field-Tested|Well-Worn|Battle-Scarred)\)/);
   return m ? m[1] : null;
 }
 
-function condClass(cond) {
-  return { 'Factory New':'cond-fn','Minimal Wear':'cond-mw','Field-Tested':'cond-ft','Well-Worn':'cond-ww','Battle-Scarred':'cond-bs' }[cond] || '';
+function condCls(c) {
+  return {'Factory New':'cond-fn','Minimal Wear':'cond-mw','Field-Tested':'cond-ft','Well-Worn':'cond-ww','Battle-Scarred':'cond-bs'}[c] || '';
 }
 
-function condShort(cond) {
-  return { 'Factory New':'Factory New','Minimal Wear':'Minimal Wear','Field-Tested':'Field-Tested','Well-Worn':'Well-Worn','Battle-Scarred':'Battle-Scarred' }[cond] || '';
+function disc(min, sug) {
+  if (!min || !sug || sug <= 0) return 0;
+  return (sug - min) / sug * 100;
 }
 
-function isStatTrak(name) { return name.includes('StatTrak'); }
-function isSouvenir(name) { return name.includes('Souvenir'); }
+function $p(v) { return v != null ? '$' + v.toFixed(2) : '—'; }
+function weaponOf(n) { const i = n.indexOf(' | '); return (i > -1 ? n.slice(0,i) : n).replace(/^★\s*/,'').replace('StatTrak™ ','').trim(); }
+function skinOf(n)   { const i = n.indexOf(' | '); return i > -1 ? n.slice(i+3).replace(/\s*\(.*?\)\s*$/,'').replace('StatTrak™ ','').trim() : ''; }
 
-function calcDiscount(min, suggested) {
-  if (!min || !suggested || suggested <= 0) return 0;
-  return ((suggested - min) / suggested) * 100;
-}
-
-function fmt(price) {
-  if (!price && price !== 0) return '—';
-  return '$' + price.toFixed(2);
-}
-
-function fmtDiscount(d) {
-  return '-' + d.toFixed(1) + '%';
-}
-
-// ── ITEM IMAGE ───────────────────────────────────────────────────
-function getImageUrl(name) {
-  // Try Skinport CDN-style URL (they use Steam CDN internally)
-  // We'll use a community service that maps item names to images
-  return `https://api.steamapis.com/image/item/730/${encodeURIComponent(name)}`;
-}
-
-function getWeaponPart(name) {
-  // Extract weapon name before the "|"
-  const pipe = name.indexOf(' | ');
-  if (pipe !== -1) return name.substring(0, pipe).replace(/^★ /, '').replace('StatTrak™ ', '').trim();
-  return name.replace(/^★ /, '').replace('StatTrak™ ', '').trim();
-}
-
-function getSkinPart(name) {
-  const pipe = name.indexOf(' | ');
-  if (pipe !== -1) {
-    const after = name.substring(pipe + 3);
-    return after.replace(/\s*\(.*?\)\s*$/, '').replace('StatTrak™ ', '').trim();
-  }
-  return '';
-}
-
-// ── FETCH DATA ───────────────────────────────────────────────────
-async function fetchSkinport() {
-  // Try direct first, then CORS proxy fallback
-  const urls = [
-    SKINPORT_URL,
-    CORS_PROXY + encodeURIComponent(SKINPORT_URL),
-  ];
-
-  for (const url of urls) {
+// ── FETCH ────────────────────────────────────────────────────────
+async function fetchData() {
+  for (const fn of fetchers) {
     try {
-      const res = await fetch(url, {
-        headers: { 'Accept': 'application/json' },
-        signal: AbortSignal.timeout(15000),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const res = await fn();
+      if (!res.ok) continue;
       const data = await res.json();
-      if (!Array.isArray(data)) throw new Error('Invalid response');
+      if (!Array.isArray(data) || !data.length) continue;
       return data;
-    } catch (err) {
-      console.warn('Fetch attempt failed:', url, err.message);
-    }
+    } catch(e) { console.warn('Proxy attempt failed:', e.message); }
   }
-  throw new Error('Falha ao conectar com Skinport API');
+  throw new Error('Não foi possível conectar com a API Skinport. Tente novamente em instantes.');
 }
 
 async function loadData() {
-  showLoading(true);
-  hideError();
+  setBusy(true);
+  hideErr();
 
   try {
-    const raw = await fetchSkinport();
+    const raw = await fetchData();
 
-    allItems = raw.map(item => {
-      const discount = calcDiscount(item.min_price, item.suggested_price);
-      return {
-        name: item.market_hash_name,
-        weapon: getWeaponPart(item.market_hash_name),
-        skin: getSkinPart(item.market_hash_name),
-        condition: getCondition(item.market_hash_name),
-        category: getCategory(item.market_hash_name),
-        stattrak: isStatTrak(item.market_hash_name),
-        souvenir: isSouvenir(item.market_hash_name),
-        min_price: item.min_price,
-        suggested_price: item.suggested_price,
-        max_price: item.max_price,
-        mean_price: item.mean_price,
-        quantity: item.quantity || 0,
-        discount,
-        url: item.market_page || item.item_page || `https://skinport.com/market?q=${encodeURIComponent(item.market_hash_name)}`,
-        steamUrl: `https://steamcommunity.com/market/listings/730/${encodeURIComponent(item.market_hash_name)}`,
-      };
-    });
+    all = raw
+      .filter(x => x.min_price > 0)
+      .map(x => ({
+        name:      x.market_hash_name,
+        weapon:    weaponOf(x.market_hash_name),
+        skin:      skinOf(x.market_hash_name),
+        condition: cond(x.market_hash_name),
+        category:  cat(x.market_hash_name),
+        st:        x.market_hash_name.includes('StatTrak'),
+        souvenir:  x.market_hash_name.includes('Souvenir'),
+        price:     x.min_price,
+        ref:       x.suggested_price,
+        qty:       x.quantity || 0,
+        discount:  disc(x.min_price, x.suggested_price),
+        url:       x.market_page || x.item_page || `https://skinport.com/market?q=${encodeURIComponent(x.market_hash_name)}`,
+        steamUrl:  `https://steamcommunity.com/market/listings/730/${encodeURIComponent(x.market_hash_name)}`,
+      }));
 
-    lastFetchTime = new Date();
+    lastFetch = new Date();
     updateStats();
     applyFilters();
     startCountdown();
 
-  } catch (err) {
-    console.error(err);
-    showError(err.message || 'Erro desconhecido');
-    if (allItems.length === 0) {
-      document.getElementById('skinGrid').innerHTML = `
-        <div class="empty-state">
-          <div class="icon">⚠️</div>
+  } catch(e) {
+    showErr(e.message || 'Erro desconhecido');
+    if (!all.length) {
+      document.getElementById('grid').innerHTML = `
+        <div class="empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
           <h3>Falha ao carregar</h3>
           <p>Tente atualizar em alguns segundos</p>
         </div>`;
     }
-  } finally {
-    showLoading(false);
-  }
+  } finally { setBusy(false); }
 }
 
-// ── FILTERS ─────────────────────────────────────────────────────
-let activeCond = '';
-let activeCat  = '';
-let activeSt   = '';
+// ── FILTERS ──────────────────────────────────────────────────────
+function onFC() {
+  document.getElementById('fv-disc').textContent  = document.getElementById('fr-disc').value + '%';
+  document.getElementById('fv-price').textContent = '$' + parseInt(document.getElementById('fr-price').value).toLocaleString();
+  if (all.length) applyFilters();
+}
 
-function getFilters() {
-  return {
-    minDiscount: parseInt(document.getElementById('discountRange').value),
-    maxPrice:    parseInt(document.getElementById('priceRange').value),
-    sortBy:      document.getElementById('sortSelect').value,
-    cond:        activeCond,
-    cat:         activeCat,
-    st:          activeSt,
-  };
+function pickCond(el) { activeCond = el.dataset.v; setActive('#chips-cond', el); if(all.length) applyFilters(); }
+function pickCat(el)  { activeCat  = el.dataset.v; setActive('#chips-cat', el);  if(all.length) applyFilters(); }
+function pickSt(el)   { activeSt   = el.dataset.v; setActive('#chips-st', el);   if(all.length) applyFilters(); }
+
+function setActive(sel, el) {
+  document.querySelectorAll(sel + ' .chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function resetFilters() {
+  document.getElementById('fr-disc').value  = 10;
+  document.getElementById('fr-price').value = 500;
+  document.getElementById('fsort').value    = 'disc_d';
+  activeCond = ''; activeCat = ''; activeSt = '';
+  ['#chips-cond','#chips-cat','#chips-st'].forEach(sel => {
+    const chips = document.querySelectorAll(sel + ' .chip');
+    chips.forEach((c,i) => c.classList.toggle('on', i===0));
+  });
+  onFC();
 }
 
 function applyFilters() {
-  const f = getFilters();
+  const minD  = parseInt(document.getElementById('fr-disc').value);
+  const maxP  = parseInt(document.getElementById('fr-price').value);
+  const sort  = document.getElementById('fsort').value;
 
-  filteredItems = allItems.filter(item => {
-    if (item.discount < f.minDiscount) return false;
-    if (item.min_price > f.maxPrice) return false;
-    if (!item.min_price) return false;
-    if (f.cond && item.condition !== f.cond) return false;
-    if (f.cat && item.category !== f.cat) return false;
-    if (f.st === 'stattrak' && !item.stattrak) return false;
-    if (f.st === 'normal' && item.stattrak) return false;
+  filtered = all.filter(x => {
+    if (x.discount < minD) return false;
+    if (x.price > maxP) return false;
+    if (activeCond && x.condition !== activeCond) return false;
+    if (activeCat  && x.category  !== activeCat)  return false;
+    if (activeSt === 'st'   && !x.st) return false;
+    if (activeSt === 'norm' &&  x.st) return false;
     return true;
   });
 
-  // Sort
-  filteredItems.sort((a, b) => {
-    switch (f.sortBy) {
-      case 'discount_desc': return b.discount - a.discount;
-      case 'discount_asc':  return a.discount - b.discount;
-      case 'price_asc':     return a.min_price - b.min_price;
-      case 'price_desc':    return b.min_price - a.min_price;
-      default:              return b.discount - a.discount;
-    }
-  });
+  filtered.sort((a,b) => ({
+    'disc_d': () => b.discount - a.discount,
+    'disc_a': () => a.discount - b.discount,
+    'price_a':() => a.price - b.price,
+    'price_d':() => b.price - a.price,
+  }[sort] || (() => b.discount - a.discount))());
 
-  displayedCount = 0;
-  document.getElementById('skinGrid').innerHTML = '';
-  document.getElementById('loadMoreWrap').style.display = 'none';
-  document.getElementById('visibleCount').textContent = filteredItems.length;
+  shown = 0;
+  document.getElementById('grid').innerHTML = '';
+  document.getElementById('lmWrap').style.display = 'none';
+  document.getElementById('ct-num').textContent = filtered.length;
 
-  if (filteredItems.length === 0) {
-    document.getElementById('skinGrid').innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🔍</div>
+  if (!filtered.length) {
+    document.getElementById('grid').innerHTML = `
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <h3>Nenhuma skin encontrada</h3>
-        <p>Tente reduzir o desconto mínimo ou aumentar o preço máximo</p>
+        <p>Reduza o desconto mínimo ou aumente o preço máximo</p>
       </div>`;
     return;
   }
-
   renderBatch();
 }
 
 function renderBatch() {
-  const grid = document.getElementById('skinGrid');
-  const slice = filteredItems.slice(displayedCount, displayedCount + PAGE_SIZE);
-  displayedCount += slice.length;
-
-  slice.forEach(item => {
-    grid.insertAdjacentHTML('beforeend', buildCard(item));
-  });
-
-  const hasMore = displayedCount < filteredItems.length;
-  document.getElementById('loadMoreWrap').style.display = hasMore ? 'flex' : 'none';
+  const grid = document.getElementById('grid');
+  const slice = filtered.slice(shown, shown + PAGE_SZ);
+  shown += slice.length;
+  slice.forEach(x => grid.insertAdjacentHTML('beforeend', buildCard(x)));
+  document.getElementById('lmWrap').style.display = shown < filtered.length ? 'flex' : 'none';
 }
 
-function loadMore() {
-  renderBatch();
-}
+function loadMore() { renderBatch(); }
 
-function buildCard(item) {
-  const disc = item.discount;
-  const discClass = disc >= 30 ? 'fire' : disc >= 20 ? 'hot' : '';
-  const cardHot = disc >= 30 ? ' hot' : '';
-  const emoji = CAT_EMOJI[item.category] || '📦';
-  const imgUrl = getImageUrl(item.name);
+function buildCard(x) {
+  const d = x.discount;
+  const badgeCls = d >= 35 ? 'red' : d >= 20 ? 'gold' : 'green';
+  const cardHot  = d >= 35 ? ' hot' : '';
+  const imgUrl   = `https://api.steamapis.com/image/item/730/${encodeURIComponent(x.name)}`;
+  const skinLabel = x.skin || x.weapon;
 
-  const condBadge = item.condition
-    ? `<span class="card-condition ${condClass(item.condition)}">${condShort(item.condition)}</span>`
-    : '';
-
-  const stBadge = item.stattrak
-    ? `<div class="stattrak-badge">ST™</div>` : '';
-
-  const souvenirBadge = item.souvenir
-    ? `<div class="stattrak-badge" style="color:#facc15;border-color:rgba(250,204,21,0.3);background:rgba(250,204,21,0.1)">SV</div>` : '';
-
-  const refPrice = item.suggested_price
-    ? `<div><span class="price-ref-label">Steam</span><span class="price-ref">${fmt(item.suggested_price)}</span></div>`
-    : '';
-
-  const skinName = item.skin || item.weapon;
+  const stBadge  = x.st       ? `<div class="badge-st">ST™</div>` : '';
+  const svBadge  = x.souvenir ? `<div class="badge-st" style="color:#eab308;border-color:rgba(234,179,8,0.25)">SV</div>` : '';
+  const condBadge = x.condition ? `<span class="card-cond ${condCls(x.condition)}">${x.condition}</span>` : '';
+  const refBlock  = x.ref ? `<div class="price-ref-wrap"><span class="price-ref-lbl">Steam</span><span class="price-ref">${$p(x.ref)}</span></div>` : '';
 
   return `
-<div class="skin-card${cardHot}">
-  <div class="card-img-area">
-    ${stBadge}${souvenirBadge}
-    <img class="item-img" src="${imgUrl}"
-      onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
-      loading="lazy" alt="${item.name}">
-    <div class="item-img-fallback" style="display:none">${emoji}</div>
-    <div class="discount-badge ${discClass}">${fmtDiscount(disc)}</div>
+<div class="card${cardHot}">
+  <div class="card-img">
+    ${stBadge}${svBadge}
+    <img class="item-img" src="${imgUrl}" loading="lazy" alt="${x.name}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="img-fallback" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div class="badge-disc ${badgeCls}">${d > 0 ? '-'+d.toFixed(1)+'%' : '?'}</div>
   </div>
   <div class="card-body">
-    <div class="card-weapon">${item.weapon}</div>
-    <div class="card-name" title="${skinName}">${skinName}</div>
+    <div class="card-weapon">${x.weapon}</div>
+    <div class="card-name" title="${skinLabel}">${skinLabel}</div>
     ${condBadge}
     <div class="price-row">
-      <div class="price-main">${fmt(item.min_price)}</div>
-      ${refPrice}
+      <div class="price-main">${$p(x.price)}</div>
+      ${refBlock}
     </div>
-    <div class="qty">
-      <span>${item.quantity}</span> disponíveis no Skinport
+    <div class="card-qty"><span>${x.qty}</span> disponíveis</div>
+    <div class="card-sep"></div>
+    <div class="card-links">
+      <a class="card-lnk" href="${x.url}" target="_blank" rel="noopener">Skinport</a>
+      <a class="card-lnk" href="${x.steamUrl}" target="_blank" rel="noopener">Steam</a>
     </div>
-    <div class="card-divider"></div>
-    <div class="card-sources" style="margin-bottom:8px">
-      <a class="source-link" href="${item.url}" target="_blank" rel="noopener">Skinport</a>
-      <a class="source-link" href="${item.steamUrl}" target="_blank" rel="noopener">Steam</a>
-    </div>
-    <a class="buy-btn" href="${item.url}" target="_blank" rel="noopener">
-      Ver deal →
-    </a>
+    <a class="card-cta" href="${x.url}" target="_blank" rel="noopener">Ver deal →</a>
   </div>
 </div>`;
 }
 
-// ── STATS ───────────────────────────────────────────────────────
+// ── STATS ────────────────────────────────────────────────────────
 function updateStats() {
-  if (!allItems.length) return;
-
-  const withDiscount = allItems.filter(i => i.discount > 0 && i.min_price);
-  const discounts = withDiscount.map(i => i.discount);
-  const avgDiscount = discounts.length ? discounts.reduce((a, b) => a + b, 0) / discounts.length : 0;
-  const bestDiscount = Math.max(...discounts);
-  const bestItem = withDiscount.find(i => i.discount === bestDiscount);
-  const cheapest = [...withDiscount].sort((a, b) => a.min_price - b.min_price)[0];
-
-  document.getElementById('statDeals').textContent = withDiscount.length;
-  document.getElementById('statAvgDiscount').textContent = '-' + avgDiscount.toFixed(1) + '%';
-  document.getElementById('statBestDiscount').textContent = bestItem
-    ? `-${bestDiscount.toFixed(1)}% (${getWeaponPart(bestItem.name)})`
-    : '—';
-  document.getElementById('statCheapest').textContent = cheapest ? fmt(cheapest.min_price) : '—';
-  document.getElementById('statTotal').textContent = allItems.length;
+  const valid = all.filter(x => x.discount > 0);
+  if (!valid.length) return;
+  const avg  = valid.reduce((s,x) => s + x.discount, 0) / valid.length;
+  const best = valid.reduce((a,x) => x.discount > a.discount ? x : a, valid[0]);
+  const cheap = [...valid].sort((a,b) => a.price - b.price)[0];
+  el('sv-deals', valid.length);
+  el('sv-avg',   '-' + avg.toFixed(1) + '%');
+  el('sv-best',  '-' + best.discount.toFixed(1) + '% · ' + best.weapon);
+  el('sv-cheap', $p(cheap.price));
+  el('sv-total', all.length.toLocaleString());
 }
 
-// ── FILTER HANDLERS ─────────────────────────────────────────────
-function onFilterChange() {
-  const dr = document.getElementById('discountRange');
-  const pr = document.getElementById('priceRange');
-  document.getElementById('discountVal').textContent = dr.value + '%';
-  document.getElementById('priceVal').textContent = '$' + parseInt(pr.value).toLocaleString();
-  if (allItems.length) applyFilters();
-}
+function el(id, v) { const e = document.getElementById(id); if(e) e.textContent = v; }
 
-function toggleCond(el) {
-  activeCond = el.dataset.cond;
-  document.querySelectorAll('#condChips .chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  if (allItems.length) applyFilters();
-}
-
-function toggleCat(el) {
-  activeCat = el.dataset.cat;
-  document.querySelectorAll('#catChips .chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  if (allItems.length) applyFilters();
-}
-
-function toggleSt(el) {
-  activeSt = el.dataset.st;
-  document.querySelectorAll('#stChips .chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  if (allItems.length) applyFilters();
-}
-
-function resetFilters() {
-  document.getElementById('discountRange').value = 10;
-  document.getElementById('priceRange').value = 500;
-  document.getElementById('sortSelect').value = 'discount_desc';
-  activeCond = '';
-  activeCat  = '';
-  activeSt   = '';
-  document.querySelectorAll('#condChips .chip').forEach((c,i) => c.classList.toggle('active', i === 0));
-  document.querySelectorAll('#catChips .chip').forEach((c,i) => c.classList.toggle('active', i === 0));
-  document.querySelectorAll('#stChips .chip').forEach((c,i) => c.classList.toggle('active', i === 0));
-  onFilterChange();
-}
-
-// ── COUNTDOWN ───────────────────────────────────────────────────
+// ── COUNTDOWN ────────────────────────────────────────────────────
 function startCountdown() {
-  if (countdownInterval) clearInterval(countdownInterval);
-  if (refreshTimeout) clearTimeout(refreshTimeout);
-
-  let remaining = REFRESH_INTERVAL;
-
-  const el = document.getElementById('countdown');
-  const update = () => {
-    const m = Math.floor(remaining / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
-    el.textContent = `Próximo update: ${m}:${s.toString().padStart(2,'0')}`;
+  if (cTimer) clearInterval(cTimer);
+  if (rTimer) clearTimeout(rTimer);
+  let rem = REFRESH_MS;
+  const upd = () => {
+    const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000);
+    el('countdownLbl', `↻ ${m}:${s.toString().padStart(2,'0')}`);
   };
-
-  update();
-  countdownInterval = setInterval(() => {
-    remaining -= 1000;
-    if (remaining <= 0) {
-      clearInterval(countdownInterval);
-      el.textContent = 'Atualizando...';
-    } else {
-      update();
-    }
-  }, 1000);
-
-  refreshTimeout = setTimeout(() => {
-    refresh();
-  }, REFRESH_INTERVAL);
-
-  if (lastFetchTime) {
-    const t = lastFetchTime;
-    const tf = t.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    document.getElementById('updateTime').textContent = `Atualizado às ${tf}`;
-  }
+  upd();
+  cTimer = setInterval(() => { rem -= 1000; rem <= 0 ? el('countdownLbl','Atualizando...') : upd(); }, 1000);
+  rTimer = setTimeout(refresh, REFRESH_MS);
+  if (lastFetch) el('updateLbl', 'Atualizado ' + lastFetch.toLocaleTimeString('pt-BR'));
 }
 
 async function refresh() {
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
+  const btn = document.getElementById('btnRefresh');
+  btn.classList.add('spin');
   await loadData();
-  btn.classList.remove('spinning');
+  btn.classList.remove('spin');
 }
 
-// ── UI HELPERS ──────────────────────────────────────────────────
-function showLoading(show) {
-  document.getElementById('loadingOverlay').classList.toggle('active', show);
+// ── HELPERS ──────────────────────────────────────────────────────
+function setBusy(v) {
+  // Use skeleton if no data yet; otherwise just spin the button
+  if (v && !all.length) {
+    document.getElementById('grid').innerHTML =
+      Array(6).fill('<div class="skel"><div class="skel-inner"></div></div>').join('');
+  }
 }
 
-function showError(msg) {
-  const el = document.getElementById('errorBanner');
-  document.getElementById('errorMsg').textContent = msg;
-  el.classList.add('visible');
+function showErr(msg) {
+  const b = document.getElementById('errBanner');
+  document.getElementById('errMsg').textContent = msg;
+  b.classList.add('show');
 }
 
-function hideError() {
-  document.getElementById('errorBanner').classList.remove('visible');
-}
+function hideErr() { document.getElementById('errBanner').classList.remove('show'); }
 
-// ── INIT ────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  onFilterChange(); // Set initial display values
-  loadData();
-});
+// ── BOOT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => { onFC(); loadData(); });
 </script>
 </body>
 </html>
