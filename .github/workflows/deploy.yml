@@ -3,8 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'data/**'       # skip deploy on hourly data updates
   workflow_dispatch:
 
 permissions:
