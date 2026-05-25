@@ -864,13 +864,24 @@ input[type=range]::-webkit-slider-thumb:hover { transform:scale(1.2); }
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────
-const BASE_URL   = 'https://api.skinport.com/v1/items?app_id=730&currency=USD';
-const PAGE_SZ    = 48;
-const REFRESH_MS = 3 * 60 * 1000;
+const BASE_URL     = 'https://api.skinport.com/v1/items?app_id=730&currency=USD';
+// Same-origin cached data updated by GitHub Actions every 2h — no CORS needed
+const LOCAL_DATA   = './data/skinport.json';
+const PAGE_SZ      = 48;
+const REFRESH_MS   = 5 * 60 * 1000;
 
-// Try multiple CORS strategies
+// Strategy 1: same-origin local cache (GitHub Actions refreshes this)
+// Strategy 2-4: live CORS proxies as fallback
 const fetchers = [
-  () => fetch(BASE_URL, { signal: AbortSignal.timeout(10000) }),
+  async () => {
+    const r = await fetch(LOCAL_DATA + '?t=' + Date.now(), { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error(`local data ${r.status}`);
+    const j = await r.json();
+    // If wrapper format {fetched_at, items:[...]} unwrap it
+    if (j && j.items && Array.isArray(j.items) && j.items.length > 0) return j.items;
+    if (Array.isArray(j) && j.length > 0) return j;
+    throw new Error('local data empty or placeholder');
+  },
   () => fetch('https://corsproxy.io/?' + encodeURIComponent(BASE_URL), { signal: AbortSignal.timeout(15000) }),
   () => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(BASE_URL), { signal: AbortSignal.timeout(15000) }),
   () => fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(BASE_URL), { signal: AbortSignal.timeout(15000) }),
@@ -915,16 +926,27 @@ function skinOf(n)   { const i = n.indexOf(' | '); return i > -1 ? n.slice(i+3).
 
 // ── FETCH ────────────────────────────────────────────────────────
 async function fetchData() {
-  for (const fn of fetchers) {
+  for (let i = 0; i < fetchers.length; i++) {
     try {
-      const res = await fn();
-      if (!res.ok) continue;
-      const data = await res.json();
-      if (!Array.isArray(data) || !data.length) continue;
-      return data;
-    } catch(e) { console.warn('Proxy attempt failed:', e.message); }
+      const result = await fetchers[i]();
+      // First fetcher returns array directly; others return Response
+      if (Array.isArray(result) && result.length) {
+        console.log(`✓ Data loaded via ${i === 0 ? 'local cache' : 'proxy #' + i} (${result.length} items)`);
+        return result;
+      }
+      if (result && result.ok !== undefined) {
+        if (!result.ok) { console.warn(`Fetcher ${i} HTTP ${result.status}`); continue; }
+        const data = await result.json();
+        const items = (data && data.items && Array.isArray(data.items)) ? data.items
+                    : Array.isArray(data) ? data : null;
+        if (items && items.length) {
+          console.log(`✓ Data loaded via proxy #${i} (${items.length} items)`);
+          return items;
+        }
+      }
+    } catch(e) { console.warn(`Fetcher ${i} failed:`, e.message); }
   }
-  throw new Error('Não foi possível conectar com a API Skinport. Tente novamente em instantes.');
+  throw new Error('Não foi possível carregar os dados. O GitHub Actions irá atualizar em breve.');
 }
 
 async function loadData() {
